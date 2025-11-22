@@ -13,6 +13,7 @@ import { OrderList } from '@/components/OrderList';
 import { DriverForm } from '@/components/DriverForm';
 import { DriverList } from '@/components/DriverList';
 import { Map } from '@/components/Map';
+import { DriverMapView } from '@/components/DriverMapView';
 
 function App() {
   const { data, loading, error, refetch } = useHealthCheck();
@@ -163,20 +164,32 @@ function App() {
           </div>
         </div>
 
-        <div className="space-y-6">
-          <div className="text-center space-y-2">
-            <h2 className="text-2xl font-bold tracking-tight">Delivery Map</h2>
-            <p className="text-muted-foreground">
-              Interactive map showing delivery locations in Brooklyn, NY
-            </p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="space-y-6">
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-bold tracking-tight">Static Map</h2>
+              <p className="text-muted-foreground">
+                Interactive map showing delivery locations in Brooklyn, NY
+              </p>
+            </div>
+            <Map
+              markers={[
+                { position: [40.6782, -73.9442], label: 'Brooklyn Center' },
+                { position: [40.7128, -73.9458], label: 'Williamsburg' },
+                { position: [40.6501, -73.9496], label: 'Park Slope' },
+              ]}
+            />
           </div>
-          <Map
-            markers={[
-              { position: [40.6782, -73.9442], label: 'Brooklyn Center' },
-              { position: [40.7128, -73.9458], label: 'Williamsburg' },
-              { position: [40.6501, -73.9496], label: 'Park Slope' },
-            ]}
-          />
+
+          <div className="space-y-6">
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-bold tracking-tight">Driver Deliveries</h2>
+              <p className="text-muted-foreground">
+                View assigned orders for each driver
+              </p>
+            </div>
+            <DriverMapView />
+          </div>
         </div>
 
         <div className="text-center text-sm text-muted-foreground space-y-1">
@@ -197,6 +210,7 @@ function App() {
           <p>✅ Story 3.7: Driver-specific order views</p>
           <p>✅ Story 4.1: Leaflet map integration</p>
           <p>✅ Story 4.2: Geocoding support for addresses</p>
+          <p>✅ Story 4.3: Driver-specific order map views</p>
         </div>
       </div>
     </div>

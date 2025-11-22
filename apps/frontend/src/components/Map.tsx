@@ -1,5 +1,6 @@
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { LatLngExpression } from 'leaflet';
+import { useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { LatLngExpression, LatLngBounds } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Card } from './ui/card';
 
@@ -27,11 +28,30 @@ interface MapProps {
   center?: LatLngExpression;
   zoom?: number;
   className?: string;
+  fitBounds?: boolean; // Story 4.3: Auto-fit map to show all markers
+}
+
+/**
+ * Component to fit map bounds to markers
+ * Story 4.3: Auto-fit functionality
+ */
+function FitBounds({ markers }: { markers: MapMarker[] }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (markers.length > 0) {
+      const bounds = new LatLngBounds(markers.map(m => m.position as [number, number]));
+      map.fitBounds(bounds, { padding: [50, 50] });
+    }
+  }, [markers, map]);
+
+  return null;
 }
 
 /**
  * Reusable Map component using Leaflet and OpenStreetMap
  * Story 4.1: Integrate Leaflet Map Component
+ * Story 4.3: Enhanced with auto-fit bounds
  *
  * Centered on Brooklyn, NY by default with interactive controls
  */
@@ -39,7 +59,8 @@ export function Map({
   markers = [],
   center = [40.6782, -73.9442], // Brooklyn, NY coordinates
   zoom = 12,
-  className = ''
+  className = '',
+  fitBounds = false
 }: MapProps) {
   return (
     <Card className={`overflow-hidden ${className}`}>
@@ -60,6 +81,8 @@ export function Map({
             <Popup>{marker.label}</Popup>
           </Marker>
         ))}
+
+        {fitBounds && <FitBounds markers={markers} />}
       </MapContainer>
     </Card>
   );
