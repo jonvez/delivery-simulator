@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import { LatLngExpression, LatLngBounds, DivIcon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Card } from './ui/card';
+import { Card } from '@/components/ui/card';
 
 // Fix for default marker icons in react-leaflet
 import L from 'leaflet';

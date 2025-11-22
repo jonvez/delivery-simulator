@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import type { Order } from '../types/order';
-import type { Driver } from '../types/driver';
-import { OrderStatus } from '../types/order';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
-import { Button } from './ui/button';
+import type { Order } from '@/types/order';
+import type { Driver } from '@/types/driver';
+import { OrderStatus } from '@/types/order';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface OrderCardProps {
   order: Order;

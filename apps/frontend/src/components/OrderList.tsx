@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
-import { useOrders } from '../hooks/useOrders';
-import { useDrivers } from '../hooks/useDrivers';
-import { useAssignOrder } from '../hooks/useAssignOrder';
+import { useOrders } from '@/hooks/useOrders';
+import { useDrivers } from '@/hooks/useDrivers';
+import { useAssignOrder } from '@/hooks/useAssignOrder';
 import { OrderCard } from './OrderCard';
-import type { Order } from '../types/order';
-import { OrderStatus } from '../types/order';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
+import type { Order } from '@/types/order';
+import { OrderStatus } from '@/types/order';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 /**
  * Component for displaying all orders grouped by status

@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Map, MapMarker } from './Map';
-import { useDrivers } from '../hooks/useDrivers';
-import { useDriverOrders } from '../hooks/useDriverOrders';
-import { OrderStatus } from '../types/order';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Map, MapMarker } from '@/components/Map';
+import { useDrivers } from '@/hooks/useDrivers';
+import { useDriverOrders } from '@/hooks/useDriverOrders';
+import { OrderStatus } from '@/types/order';
 
 /**
  * Component for displaying a driver's assigned orders on a map

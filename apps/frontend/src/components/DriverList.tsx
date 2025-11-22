@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Card } from './ui/card';
-import { useDrivers } from '../hooks/useDrivers';
-import { useUpdateDriver } from '../hooks/useUpdateDriver';
-import { useDriverOrders } from '../hooks/useDriverOrders';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import { useDrivers } from '@/hooks/useDrivers';
+import { useUpdateDriver } from '@/hooks/useUpdateDriver';
+import { useDriverOrders } from '@/hooks/useDriverOrders';
 import { OrderCard } from './OrderCard';
-import { OrderStatus } from '../types/order';
-import type { Driver } from '../types/driver';
+import { OrderStatus } from '@/types/order';
+import type { Driver } from '@/types/driver';
 
 interface DriverCardProps {
   driver: Driver;
