@@ -9,13 +9,14 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { useHealthCheck } from '@/hooks/useHealthCheck';
 import { OrderForm } from '@/components/OrderForm';
+import { OrderList } from '@/components/OrderList';
 
 function App() {
   const { data, loading, error, refetch } = useHealthCheck();
 
   return (
     <div className="min-h-screen bg-background p-8">
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto space-y-8">
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-bold tracking-tight">Delivery Manager</h1>
           <p className="text-muted-foreground">
@@ -121,6 +122,8 @@ function App() {
 
         <OrderForm />
 
+        <OrderList />
+
         <div className="text-center text-sm text-muted-foreground space-y-1">
           <p>✅ Story 1.1: Monorepo initialized</p>
           <p>✅ Story 1.2: shadcn/ui and Tailwind CSS configured</p>
@@ -129,6 +132,7 @@ function App() {
           <p>✅ Story 1.5: Frontend connected to backend</p>
           <p>✅ Story 2.1: Order database schema and API endpoints</p>
           <p>✅ Story 2.2: Create order form UI</p>
+          <p>✅ Story 2.3: Order list with status grouping</p>
         </div>
       </div>
     </div>
