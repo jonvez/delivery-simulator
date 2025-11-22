@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useHealthCheck } from '@/hooks/useHealthCheck';
+import { OrderForm } from '@/components/OrderForm';
 
 function App() {
   const { data, loading, error, refetch } = useHealthCheck();
@@ -118,12 +119,16 @@ function App() {
           </CardContent>
         </Card>
 
+        <OrderForm />
+
         <div className="text-center text-sm text-muted-foreground space-y-1">
           <p>✅ Story 1.1: Monorepo initialized</p>
           <p>✅ Story 1.2: shadcn/ui and Tailwind CSS configured</p>
           <p>✅ Story 1.3: PostgreSQL and Prisma ORM set up</p>
           <p>✅ Story 1.4: Express API with health check endpoint</p>
           <p>✅ Story 1.5: Frontend connected to backend</p>
+          <p>✅ Story 2.1: Order database schema and API endpoints</p>
+          <p>✅ Story 2.2: Create order form UI</p>
         </div>
       </div>
     </div>
