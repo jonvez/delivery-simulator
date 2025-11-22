@@ -3,6 +3,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
 import { createDriverSchema, updateDriverSchema } from '../schemas/driver.schema';
 import { driverService } from '../services/driver.service';
+import { orderService } from '../services/order.service';
 import { Prisma } from '@prisma/client';
 
 const router = Router();
@@ -59,6 +60,33 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
     }
 
     res.json(driver);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * GET /api/drivers/:id/orders
+ * Get all orders assigned to a specific driver
+ * Story 3.7: Display Driver-Specific Order Views
+ */
+router.get('/:id/orders', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+
+    // Verify driver exists
+    const driver = await driverService.getDriverById(id);
+    if (!driver) {
+      return res.status(404).json({
+        error: {
+          message: 'Driver not found',
+        },
+      });
+    }
+
+    // Get all orders for this driver
+    const orders = await orderService.getOrdersByDriverId(id);
+    res.json(orders);
   } catch (error) {
     next(error);
   }

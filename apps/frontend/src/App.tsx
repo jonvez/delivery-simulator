@@ -177,6 +177,7 @@ function App() {
           <p>✅ Story 3.4: Order-driver assignment relationship</p>
           <p>✅ Story 3.5: Order assignment to drivers</p>
           <p>✅ Story 3.6: Order reassignment</p>
+          <p>✅ Story 3.7: Driver-specific order views</p>
         </div>
       </div>
     </div>

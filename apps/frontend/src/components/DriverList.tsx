@@ -1,17 +1,109 @@
+import { useState } from 'react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Card } from './ui/card';
 import { useDrivers } from '../hooks/useDrivers';
 import { useUpdateDriver } from '../hooks/useUpdateDriver';
+import { useDriverOrders } from '../hooks/useDriverOrders';
+import { OrderCard } from './OrderCard';
+import { OrderStatus } from '../types/order';
+import type { Driver } from '../types/driver';
+
+interface DriverCardProps {
+  driver: Driver;
+  isExpanded: boolean;
+  onToggleExpansion: (driverId: string) => void;
+  onToggleAvailability: (driverId: string, currentAvailability: boolean) => void;
+  updating: boolean;
+}
+
+/**
+ * Component for displaying a single driver with their orders
+ * Story 3.7: Display Driver-Specific Order Views
+ */
+function DriverCard({ driver, isExpanded, onToggleExpansion, onToggleAvailability, updating }: DriverCardProps) {
+  const { orders, loading: ordersLoading } = useDriverOrders(isExpanded ? driver.id : null);
+
+  const activeOrders = orders.filter(
+    (order) => order.status === OrderStatus.ASSIGNED || order.status === OrderStatus.IN_TRANSIT
+  );
+
+  return (
+    <Card className="p-4">
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <h4 className="font-medium">{driver.name}</h4>
+            {activeOrders.length > 0 && (
+              <Badge variant="outline" className="text-xs">
+                {activeOrders.length} active order{activeOrders.length !== 1 ? 's' : ''}
+              </Badge>
+            )}
+          </div>
+          <p className="text-sm text-gray-500">
+            Added {new Date(driver.createdAt).toLocaleDateString()}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge
+            variant={driver.isAvailable ? 'default' : 'secondary'}
+            className={driver.isAvailable ? 'bg-green-600' : ''}
+          >
+            {driver.isAvailable ? 'Available' : 'Unavailable'}
+          </Badge>
+          <Button
+            onClick={() => onToggleAvailability(driver.id, driver.isAvailable)}
+            variant="outline"
+            size="sm"
+            disabled={updating}
+          >
+            {driver.isAvailable ? 'Mark Unavailable' : 'Mark Available'}
+          </Button>
+          <Button
+            onClick={() => onToggleExpansion(driver.id)}
+            variant="ghost"
+            size="sm"
+          >
+            {isExpanded ? 'Hide Orders' : 'View Orders'}
+          </Button>
+        </div>
+      </div>
+
+      {/* Expanded view showing driver's orders */}
+      {isExpanded && (
+        <div className="mt-4 pt-4 border-t space-y-4">
+          {ordersLoading ? (
+            <div className="text-center text-gray-500 py-4">Loading orders...</div>
+          ) : orders.length === 0 ? (
+            <div className="text-center text-gray-500 py-4">No orders assigned yet</div>
+          ) : (
+            <>
+              <div>
+                <h5 className="font-semibold text-sm mb-2">All Orders ({orders.length})</h5>
+                <div className="grid gap-3 md:grid-cols-2">
+                  {orders.map((order) => (
+                    <OrderCard key={order.id} order={order} />
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </Card>
+  );
+}
 
 /**
  * Component for displaying list of all drivers
  * Story 3.2: Build Driver Management UI
  * Story 3.3: Implement Driver Availability Toggle
+ * Story 3.7: Display Driver-Specific Order Views
  */
 export function DriverList() {
   const { drivers, loading, error, refetch } = useDrivers();
   const { updateDriver, loading: updating } = useUpdateDriver();
+  const [expandedDriverId, setExpandedDriverId] = useState<string | null>(null);
 
   const handleToggleAvailability = async (driverId: string, currentAvailability: boolean) => {
     const updated = await updateDriver(driverId, { isAvailable: !currentAvailability });
@@ -19,6 +111,10 @@ export function DriverList() {
       // Refresh the driver list to show updated availability
       refetch();
     }
+  };
+
+  const toggleDriverExpansion = (driverId: string) => {
+    setExpandedDriverId(expandedDriverId === driverId ? null : driverId);
   };
 
   if (loading) {
@@ -69,32 +165,14 @@ export function DriverList() {
 
       <div className="space-y-2">
         {drivers.map((driver) => (
-          <Card key={driver.id} className="p-4">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex-1">
-                <h4 className="font-medium">{driver.name}</h4>
-                <p className="text-sm text-gray-500">
-                  Added {new Date(driver.createdAt).toLocaleDateString()}
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge
-                  variant={driver.isAvailable ? 'default' : 'secondary'}
-                  className={driver.isAvailable ? 'bg-green-600' : ''}
-                >
-                  {driver.isAvailable ? 'Available' : 'Unavailable'}
-                </Badge>
-                <Button
-                  onClick={() => handleToggleAvailability(driver.id, driver.isAvailable)}
-                  variant="outline"
-                  size="sm"
-                  disabled={updating}
-                >
-                  {driver.isAvailable ? 'Mark Unavailable' : 'Mark Available'}
-                </Button>
-              </div>
-            </div>
-          </Card>
+          <DriverCard
+            key={driver.id}
+            driver={driver}
+            isExpanded={expandedDriverId === driver.id}
+            onToggleExpansion={toggleDriverExpansion}
+            onToggleAvailability={handleToggleAvailability}
+            updating={updating}
+          />
         ))}
       </div>
     </div>

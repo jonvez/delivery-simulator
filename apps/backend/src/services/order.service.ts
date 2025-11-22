@@ -58,6 +58,24 @@ export class OrderService {
   }
 
   /**
+   * Get all orders assigned to a specific driver
+   * Story 3.7: Display Driver-Specific Order Views
+   */
+  async getOrdersByDriverId(driverId: string): Promise<OrderWithDriver[]> {
+    return prisma.order.findMany({
+      where: {
+        driverId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        driver: true,
+      },
+    });
+  }
+
+  /**
    * Update an order and automatically set timestamps based on status transitions
    */
   async updateOrder(id: string, data: UpdateOrderInput): Promise<Order> {
