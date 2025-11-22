@@ -1,6 +1,7 @@
 import { Order, OrderStatus, Prisma } from '@prisma/client';
 import prisma from '../db/client';
 import { CreateOrderInput, UpdateOrderInput } from '../schemas/order.schema';
+import { geocodeAddress } from '../utils/geocoding';
 
 // Type for order with driver information - Story 3.4
 type OrderWithDriver = Prisma.OrderGetPayload<{
@@ -10,12 +11,18 @@ type OrderWithDriver = Prisma.OrderGetPayload<{
 export class OrderService {
   /**
    * Create a new order with status PENDING
+   * Story 4.2: Now geocodes the delivery address
    */
   async createOrder(data: CreateOrderInput): Promise<Order> {
+    // Geocode the delivery address
+    const coordinates = await geocodeAddress(data.deliveryAddress);
+
     return prisma.order.create({
       data: {
         ...data,
         status: OrderStatus.PENDING,
+        latitude: coordinates.latitude,
+        longitude: coordinates.longitude,
       },
     });
   }

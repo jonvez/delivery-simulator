@@ -196,6 +196,7 @@ function App() {
           <p>✅ Story 3.6: Order reassignment</p>
           <p>✅ Story 3.7: Driver-specific order views</p>
           <p>✅ Story 4.1: Leaflet map integration</p>
+          <p>✅ Story 4.2: Geocoding support for addresses</p>
         </div>
       </div>
     </div>

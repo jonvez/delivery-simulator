@@ -14,6 +14,9 @@ export interface Order {
   deliveryAddress: string;
   orderDetails: string | null;
   status: OrderStatus;
+  // Geocoding - Story 4.2
+  latitude: number | null;
+  longitude: number | null;
   driverId: string | null;
   driver: {
     id: string;

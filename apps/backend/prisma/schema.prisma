@@ -36,6 +36,10 @@ model Order {
   orderDetails    String?
   status          OrderStatus @default(PENDING)
 
+  // Geocoding support - Story 4.2
+  latitude        Float?
+  longitude       Float?
+
   // Assignment relationship - Story 3.4
   driverId        String?
   driver          Driver?     @relation(fields: [driverId], references: [id])

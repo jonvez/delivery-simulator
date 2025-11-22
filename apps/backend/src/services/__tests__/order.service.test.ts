@@ -55,6 +55,8 @@ describe('OrderService', () => {
         data: {
           ...mockOrderData,
           status: OrderStatus.PENDING,
+          latitude: expect.any(Number),
+          longitude: expect.any(Number),
         },
       });
       expect(result).toEqual(mockCreatedOrder);
