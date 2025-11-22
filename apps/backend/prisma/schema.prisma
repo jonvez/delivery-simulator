@@ -49,3 +49,14 @@ model Order {
   @@index([status])
   @@index([createdAt])
 }
+
+// Driver model - Story 3.1
+model Driver {
+  id          String   @id @default(uuid())
+  name        String
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@map("drivers")
+  @@index([isAvailable])
+}
