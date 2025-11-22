@@ -12,6 +12,7 @@ import { OrderForm } from '@/components/OrderForm';
 import { OrderList } from '@/components/OrderList';
 import { DriverForm } from '@/components/DriverForm';
 import { DriverList } from '@/components/DriverList';
+import { Map } from '@/components/Map';
 
 function App() {
   const { data, loading, error, refetch } = useHealthCheck();
@@ -162,6 +163,22 @@ function App() {
           </div>
         </div>
 
+        <div className="space-y-6">
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl font-bold tracking-tight">Delivery Map</h2>
+            <p className="text-muted-foreground">
+              Interactive map showing delivery locations in Brooklyn, NY
+            </p>
+          </div>
+          <Map
+            markers={[
+              { position: [40.6782, -73.9442], label: 'Brooklyn Center' },
+              { position: [40.7128, -73.9458], label: 'Williamsburg' },
+              { position: [40.6501, -73.9496], label: 'Park Slope' },
+            ]}
+          />
+        </div>
+
         <div className="text-center text-sm text-muted-foreground space-y-1">
           <p>✅ Story 1.1: Monorepo initialized</p>
           <p>✅ Story 1.2: shadcn/ui and Tailwind CSS configured</p>
@@ -178,6 +195,7 @@ function App() {
           <p>✅ Story 3.5: Order assignment to drivers</p>
           <p>✅ Story 3.6: Order reassignment</p>
           <p>✅ Story 3.7: Driver-specific order views</p>
+          <p>✅ Story 4.1: Leaflet map integration</p>
         </div>
       </div>
     </div>
