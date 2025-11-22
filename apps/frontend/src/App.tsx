@@ -10,6 +10,8 @@ import { Badge } from '@/components/ui/badge';
 import { useHealthCheck } from '@/hooks/useHealthCheck';
 import { OrderForm } from '@/components/OrderForm';
 import { OrderList } from '@/components/OrderList';
+import { DriverForm } from '@/components/DriverForm';
+import { DriverList } from '@/components/DriverList';
 
 function App() {
   const { data, loading, error, refetch } = useHealthCheck();
@@ -120,9 +122,45 @@ function App() {
           </CardContent>
         </Card>
 
-        <OrderForm />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Orders</CardTitle>
+                <CardDescription>Create and manage delivery orders</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <OrderForm />
+              </CardContent>
+            </Card>
 
-        <OrderList />
+            <OrderList />
+          </div>
+
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Drivers</CardTitle>
+                <CardDescription>Manage your delivery drivers</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <DriverForm onDriverCreated={() => {
+                  // Driver list will auto-refresh via useDrivers hook
+                }} />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Driver List</CardTitle>
+                <CardDescription>All registered drivers</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <DriverList />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
 
         <div className="text-center text-sm text-muted-foreground space-y-1">
           <p>✅ Story 1.1: Monorepo initialized</p>
@@ -133,6 +171,8 @@ function App() {
           <p>✅ Story 2.1: Order database schema and API endpoints</p>
           <p>✅ Story 2.2: Create order form UI</p>
           <p>✅ Story 2.3: Order list with status grouping</p>
+          <p>✅ Story 3.1: Driver database schema and API endpoints</p>
+          <p>✅ Story 3.2: Driver management UI</p>
         </div>
       </div>
     </div>
