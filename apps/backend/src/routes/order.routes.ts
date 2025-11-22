@@ -113,4 +113,40 @@ router.delete('/:id', async (req: Request, res: Response, next: NextFunction) =>
   }
 });
 
+// PATCH /api/orders/:id/assign - Assign order to driver
+// Story 3.5: Implement Order Assignment to Drivers
+router.patch('/:id/assign', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const { driverId } = req.body;
+
+    if (!driverId || typeof driverId !== 'string') {
+      return res.status(400).json({
+        error: 'driverId is required and must be a string',
+      });
+    }
+
+    const order = await orderService.assignOrderToDriver(id, driverId);
+
+    res.json(order);
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.message === 'Driver not found') {
+        return res.status(404).json({ error: 'Driver not found' });
+      }
+      if (error.message === 'Driver is not available for assignment') {
+        return res.status(400).json({ error: 'Driver is not available for assignment' });
+      }
+    }
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2025') {
+        return res.status(404).json({
+          error: 'Order not found',
+        });
+      }
+    }
+    next(error);
+  }
+});
+
 export default router;

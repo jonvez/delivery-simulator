@@ -115,6 +115,38 @@ export class OrderService {
 
     return result;
   }
+
+  /**
+   * Assign an order to a driver
+   * Story 3.5: Implement Order Assignment to Drivers
+   */
+  async assignOrderToDriver(orderId: string, driverId: string): Promise<OrderWithDriver> {
+    // Verify driver exists and is available
+    const driver = await prisma.driver.findUnique({
+      where: { id: driverId },
+    });
+
+    if (!driver) {
+      throw new Error('Driver not found');
+    }
+
+    if (!driver.isAvailable) {
+      throw new Error('Driver is not available for assignment');
+    }
+
+    // Update order with driver assignment and set status to ASSIGNED
+    return prisma.order.update({
+      where: { id: orderId },
+      data: {
+        driverId,
+        status: OrderStatus.ASSIGNED,
+        assignedAt: new Date(),
+      },
+      include: {
+        driver: true,
+      },
+    });
+  }
 }
 
 export const orderService = new OrderService();
