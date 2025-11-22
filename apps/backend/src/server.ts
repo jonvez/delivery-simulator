@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import winston from 'winston';
 import prisma from './db/client';
+import { checkDatabaseConnection, formatHealthCheckResponse } from './utils/healthCheck';
 
 // Load environment variables
 dotenv.config();
@@ -55,14 +56,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // Health check endpoint
 app.get('/api/health', async (_req: Request, res: Response, next: NextFunction) => {
   try {
-    // Test database connectivity
-    await prisma.$queryRaw`SELECT 1`;
-
-    res.json({
-      status: 'ok',
-      database: 'connected',
-      timestamp: new Date().toISOString(),
-    });
+    const result = await checkDatabaseConnection(prisma);
+    const response = formatHealthCheckResponse(result);
+    res.json(response);
   } catch (error) {
     next(error);
   }
