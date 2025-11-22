@@ -119,8 +119,18 @@ export class OrderService {
   /**
    * Assign an order to a driver
    * Story 3.5: Implement Order Assignment to Drivers
+   * Story 3.6: Extended to support reassignment of ASSIGNED/IN_TRANSIT orders
    */
   async assignOrderToDriver(orderId: string, driverId: string): Promise<OrderWithDriver> {
+    // Get the current order
+    const currentOrder = await prisma.order.findUnique({
+      where: { id: orderId },
+    });
+
+    if (!currentOrder) {
+      throw new Error('Order not found');
+    }
+
     // Verify driver exists and is available
     const driver = await prisma.driver.findUnique({
       where: { id: driverId },
@@ -134,14 +144,32 @@ export class OrderService {
       throw new Error('Driver is not available for assignment');
     }
 
-    // Update order with driver assignment and set status to ASSIGNED
+    // Check if this is a reassignment (order already has a driver)
+    const isReassignment = currentOrder.driverId !== null;
+
+    // Don't allow reassignment of delivered orders
+    if (currentOrder.status === OrderStatus.DELIVERED) {
+      throw new Error('Cannot reassign a delivered order');
+    }
+
+    // For reassignment, keep the current status (ASSIGNED or IN_TRANSIT)
+    // For initial assignment, set status to ASSIGNED
+    const updateData: Prisma.OrderUpdateInput = {
+      driver: {
+        connect: { id: driverId },
+      },
+    };
+
+    // Only set status to ASSIGNED and update assignedAt for initial assignments
+    if (!isReassignment) {
+      updateData.status = OrderStatus.ASSIGNED;
+      updateData.assignedAt = new Date();
+    }
+
+    // Update order with driver assignment
     return prisma.order.update({
       where: { id: orderId },
-      data: {
-        driverId,
-        status: OrderStatus.ASSIGNED,
-        assignedAt: new Date(),
-      },
+      data: updateData,
       include: {
         driver: true,
       },

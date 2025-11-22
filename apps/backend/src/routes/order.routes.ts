@@ -115,6 +115,7 @@ router.delete('/:id', async (req: Request, res: Response, next: NextFunction) =>
 
 // PATCH /api/orders/:id/assign - Assign order to driver
 // Story 3.5: Implement Order Assignment to Drivers
+// Story 3.6: Extended to support reassignment
 router.patch('/:id/assign', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
@@ -131,11 +132,17 @@ router.patch('/:id/assign', async (req: Request, res: Response, next: NextFuncti
     res.json(order);
   } catch (error) {
     if (error instanceof Error) {
+      if (error.message === 'Order not found') {
+        return res.status(404).json({ error: 'Order not found' });
+      }
       if (error.message === 'Driver not found') {
         return res.status(404).json({ error: 'Driver not found' });
       }
       if (error.message === 'Driver is not available for assignment') {
         return res.status(400).json({ error: 'Driver is not available for assignment' });
+      }
+      if (error.message === 'Cannot reassign a delivered order') {
+        return res.status(400).json({ error: 'Cannot reassign a delivered order' });
       }
     }
     if (error instanceof Prisma.PrismaClientKnownRequestError) {

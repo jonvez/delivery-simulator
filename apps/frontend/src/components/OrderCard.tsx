@@ -1,10 +1,16 @@
+import { useState } from 'react';
 import type { Order } from '../types/order';
+import type { Driver } from '../types/driver';
 import { OrderStatus } from '../types/order';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
+import { Button } from './ui/button';
 
 interface OrderCardProps {
   order: Order;
+  availableDrivers?: Driver[];
+  onAssignDriver?: (orderId: string, driverId: string) => void;
+  assigning?: boolean;
 }
 
 const statusColors: Record<OrderStatus, 'default' | 'secondary' | 'destructive' | 'outline'> = {
@@ -31,7 +37,21 @@ function formatDate(dateString: string | null): string {
   });
 }
 
-export function OrderCard({ order }: OrderCardProps) {
+export function OrderCard({ order, availableDrivers = [], onAssignDriver, assigning = false }: OrderCardProps) {
+  const [selectedDriverId, setSelectedDriverId] = useState<string | null>(null);
+
+  const handleAssign = () => {
+    if (selectedDriverId && onAssignDriver) {
+      onAssignDriver(order.id, selectedDriverId);
+      setSelectedDriverId(null);
+    }
+  };
+
+  const isPending = order.status === OrderStatus.PENDING;
+  const isAssignedOrInTransit = order.status === OrderStatus.ASSIGNED || order.status === OrderStatus.IN_TRANSIT;
+  const canAssign = isPending && availableDrivers.length > 0 && onAssignDriver;
+  const canReassign = isAssignedOrInTransit && availableDrivers.length > 0 && onAssignDriver;
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -61,6 +81,84 @@ export function OrderCard({ order }: OrderCardProps) {
               Order Details
             </p>
             <p className="text-sm">{order.orderDetails}</p>
+          </div>
+        )}
+
+        {/* Show driver info for assigned orders */}
+        {order.driver && (
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+              Assigned Driver
+            </p>
+            <p className="text-sm font-medium">{order.driver.name}</p>
+          </div>
+        )}
+
+        {/* Driver reassignment UI for ASSIGNED/IN_TRANSIT orders - Story 3.6 */}
+        {canReassign && (
+          <div className="pt-2 border-t space-y-2">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              Reassign to Different Driver
+            </p>
+            <div className="flex gap-2 flex-wrap">
+              {availableDrivers
+                .filter(driver => driver.id !== order.driverId)
+                .map((driver) => (
+                  <Button
+                    key={driver.id}
+                    variant={selectedDriverId === driver.id ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedDriverId(driver.id)}
+                    disabled={assigning}
+                    className="text-xs"
+                  >
+                    {driver.name}
+                  </Button>
+                ))}
+            </div>
+            {selectedDriverId && (
+              <Button
+                onClick={handleAssign}
+                disabled={assigning}
+                size="sm"
+                className="w-full"
+              >
+                {assigning ? 'Reassigning...' : 'Confirm Reassignment'}
+              </Button>
+            )}
+          </div>
+        )}
+
+        {/* Driver assignment UI for PENDING orders */}
+        {canAssign && (
+          <div className="pt-2 border-t space-y-2">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              Assign to Driver
+            </p>
+            <div className="flex gap-2 flex-wrap">
+              {availableDrivers.map((driver) => (
+                <Button
+                  key={driver.id}
+                  variant={selectedDriverId === driver.id ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedDriverId(driver.id)}
+                  disabled={assigning}
+                  className="text-xs"
+                >
+                  {driver.name}
+                </Button>
+              ))}
+            </div>
+            {selectedDriverId && (
+              <Button
+                onClick={handleAssign}
+                disabled={assigning}
+                size="sm"
+                className="w-full"
+              >
+                {assigning ? 'Assigning...' : 'Confirm Assignment'}
+              </Button>
+            )}
           </div>
         )}
 

@@ -14,6 +14,13 @@ export interface Order {
   deliveryAddress: string;
   orderDetails: string | null;
   status: OrderStatus;
+  driverId: string | null;
+  driver: {
+    id: string;
+    name: string;
+    isAvailable: boolean;
+    createdAt: string;
+  } | null;
   createdAt: string;
   assignedAt: string | null;
   inTransitAt: string | null;

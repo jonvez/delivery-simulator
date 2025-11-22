@@ -174,6 +174,9 @@ function App() {
           <p>✅ Story 3.1: Driver database schema and API endpoints</p>
           <p>✅ Story 3.2: Driver management UI</p>
           <p>✅ Story 3.3: Driver availability toggle</p>
+          <p>✅ Story 3.4: Order-driver assignment relationship</p>
+          <p>✅ Story 3.5: Order assignment to drivers</p>
+          <p>✅ Story 3.6: Order reassignment</p>
         </div>
       </div>
     </div>

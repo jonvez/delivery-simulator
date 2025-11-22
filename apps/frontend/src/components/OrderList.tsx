@@ -1,10 +1,18 @@
 import { useMemo } from 'react';
 import { useOrders } from '../hooks/useOrders';
+import { useDrivers } from '../hooks/useDrivers';
+import { useAssignOrder } from '../hooks/useAssignOrder';
 import { OrderCard } from './OrderCard';
 import type { Order } from '../types/order';
 import { OrderStatus } from '../types/order';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
+
+/**
+ * Component for displaying all orders grouped by status
+ * Story 3.5: Added driver assignment capability for PENDING orders
+ * Story 3.6: Added driver reassignment capability for ASSIGNED/IN_TRANSIT orders
+ */
 
 const statusSections = [
   {
@@ -31,6 +39,16 @@ const statusSections = [
 
 export function OrderList() {
   const { orders, loading, error, refetch } = useOrders();
+  const { drivers } = useDrivers();
+  const { assignOrder, loading: assigning } = useAssignOrder();
+
+  const handleAssignOrder = async (orderId: string, driverId: string) => {
+    const result = await assignOrder(orderId, driverId);
+    if (result) {
+      // Refresh orders to show updated assignment
+      refetch();
+    }
+  };
 
   // Group orders by status
   const groupedOrders = useMemo(() => {
@@ -125,7 +143,19 @@ export function OrderList() {
             </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {statusOrders.map((order) => (
-                <OrderCard key={order.id} order={order} />
+                <OrderCard
+                  key={order.id}
+                  order={order}
+                  availableDrivers={
+                    (status === OrderStatus.PENDING ||
+                     status === OrderStatus.ASSIGNED ||
+                     status === OrderStatus.IN_TRANSIT)
+                      ? drivers.filter(d => d.isAvailable)
+                      : []
+                  }
+                  onAssignDriver={handleAssignOrder}
+                  assigning={assigning}
+                />
               ))}
             </div>
           </div>
