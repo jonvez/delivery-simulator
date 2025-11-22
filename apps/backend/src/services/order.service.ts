@@ -2,6 +2,11 @@ import { Order, OrderStatus, Prisma } from '@prisma/client';
 import prisma from '../db/client';
 import { CreateOrderInput, UpdateOrderInput } from '../schemas/order.schema';
 
+// Type for order with driver information - Story 3.4
+type OrderWithDriver = Prisma.OrderGetPayload<{
+  include: { driver: true };
+}>;
+
 export class OrderService {
   /**
    * Create a new order with status PENDING
@@ -17,12 +22,13 @@ export class OrderService {
 
   /**
    * Get all orders with optional status filter
+   * Story 3.4: Include driver information
    */
   async getAllOrders(filters?: {
     status?: OrderStatus;
     limit?: number;
     offset?: number;
-  }): Promise<Order[]> {
+  }): Promise<OrderWithDriver[]> {
     const where: Prisma.OrderWhereInput = filters?.status
       ? { status: filters.status }
       : {};
@@ -32,15 +38,22 @@ export class OrderService {
       orderBy: { createdAt: 'desc' },
       take: filters?.limit,
       skip: filters?.offset,
+      include: {
+        driver: true,
+      },
     });
   }
 
   /**
    * Get a single order by ID
+   * Story 3.4: Include driver information
    */
-  async getOrderById(id: string): Promise<Order | null> {
+  async getOrderById(id: string): Promise<OrderWithDriver | null> {
     return prisma.order.findUnique({
       where: { id },
+      include: {
+        driver: true,
+      },
     });
   }
 

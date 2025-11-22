@@ -89,6 +89,7 @@ describe('OrderService', () => {
         orderBy: { createdAt: 'desc' },
         take: undefined,
         skip: undefined,
+        include: { driver: true },
       });
       expect(result).toEqual(mockOrders);
     });
@@ -121,6 +122,7 @@ describe('OrderService', () => {
         orderBy: { createdAt: 'desc' },
         take: undefined,
         skip: undefined,
+        include: { driver: true },
       });
       expect(result).toEqual(mockOrders);
     });
@@ -138,6 +140,7 @@ describe('OrderService', () => {
         orderBy: { createdAt: 'desc' },
         take: 10,
         skip: 20,
+        include: { driver: true },
       });
     });
   });
@@ -164,6 +167,7 @@ describe('OrderService', () => {
 
       expect(mockPrisma.order.findUnique).toHaveBeenCalledWith({
         where: { id: 'test-id-123' },
+        include: { driver: true },
       });
       expect(result).toEqual(mockOrder);
     });

@@ -36,6 +36,10 @@ model Order {
   orderDetails    String?
   status          OrderStatus @default(PENDING)
 
+  // Assignment relationship - Story 3.4
+  driverId        String?
+  driver          Driver?     @relation(fields: [driverId], references: [id])
+
   // Lifecycle timestamps
   createdAt       DateTime    @default(now())
   assignedAt      DateTime?
@@ -48,6 +52,7 @@ model Order {
   @@map("orders")
   @@index([status])
   @@index([createdAt])
+  @@index([driverId])
 }
 
 // Driver model - Story 3.1
@@ -56,6 +61,9 @@ model Driver {
   name        String
   isAvailable Boolean  @default(true)
   createdAt   DateTime @default(now())
+
+  // Assignment relationship - Story 3.4
+  orders      Order[]
 
   @@map("drivers")
   @@index([isAvailable])
