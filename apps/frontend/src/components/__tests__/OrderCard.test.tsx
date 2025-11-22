@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { OrderCard } from '../OrderCard';
-import { Order, OrderStatus } from '../../types/order';
+import type { Order } from '../../types/order';
+import { OrderStatus } from '../../types/order';
 
 describe('OrderCard', () => {
   const mockOrder: Order = {

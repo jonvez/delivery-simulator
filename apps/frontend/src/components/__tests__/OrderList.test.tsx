@@ -2,7 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { OrderList } from '../OrderList';
 import * as useOrdersModule from '../../hooks/useOrders';
-import { Order, OrderStatus } from '../../types/order';
+import type { Order } from '../../types/order';
+import { OrderStatus } from '../../types/order';
 
 // Mock the useOrders hook
 vi.mock('../../hooks/useOrders');

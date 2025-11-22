@@ -1,9 +1,11 @@
-export enum OrderStatus {
-  PENDING = 'PENDING',
-  ASSIGNED = 'ASSIGNED',
-  IN_TRANSIT = 'IN_TRANSIT',
-  DELIVERED = 'DELIVERED',
-}
+export const OrderStatus = {
+  PENDING: 'PENDING',
+  ASSIGNED: 'ASSIGNED',
+  IN_TRANSIT: 'IN_TRANSIT',
+  DELIVERED: 'DELIVERED',
+} as const;
+
+export type OrderStatus = typeof OrderStatus[keyof typeof OrderStatus];
 
 export interface Order {
   id: string;

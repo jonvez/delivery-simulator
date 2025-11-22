@@ -1,4 +1,5 @@
-import { Order, OrderStatus } from '../types/order';
+import type { Order } from '../types/order';
+import { OrderStatus } from '../types/order';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 

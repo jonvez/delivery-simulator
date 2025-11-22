@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { useOrders } from '../hooks/useOrders';
 import { OrderCard } from './OrderCard';
-import { Order, OrderStatus } from '../types/order';
+import type { Order } from '../types/order';
+import { OrderStatus } from '../types/order';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 

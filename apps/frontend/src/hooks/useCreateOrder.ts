@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { api, ApiError } from '../lib/api';
-import { CreateOrderInput, Order } from '../types/order';
+import type { CreateOrderInput, Order } from '../types/order';
 
 interface UseCreateOrderResult {
   createOrder: (data: CreateOrderInput) => Promise<Order | null>;

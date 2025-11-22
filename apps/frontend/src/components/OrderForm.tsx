@@ -1,11 +1,12 @@
-import { useState, FormEvent } from 'react';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { useCreateOrder } from '../hooks/useCreateOrder';
-import { CreateOrderInput } from '../types/order';
+import type { CreateOrderInput } from '../types/order';
 
 interface FormErrors {
   customerName?: string;

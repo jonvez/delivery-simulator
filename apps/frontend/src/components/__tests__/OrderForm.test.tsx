@@ -3,7 +3,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { OrderForm } from '../OrderForm';
 import * as useCreateOrderModule from '../../hooks/useCreateOrder';
-import { Order, OrderStatus } from '../../types/order';
+import type { Order } from '../../types/order';
+import { OrderStatus } from '../../types/order';
 
 // Mock the useCreateOrder hook
 vi.mock('../../hooks/useCreateOrder');
