@@ -174,10 +174,11 @@ function App() {
             </div>
             <Map
               markers={[
-                { position: [40.6782, -73.9442], label: 'Brooklyn Center' },
-                { position: [40.7128, -73.9458], label: 'Williamsburg' },
-                { position: [40.6501, -73.9496], label: 'Park Slope' },
+                { position: [40.6782, -73.9442], label: 'Brooklyn Center', sequenceNumber: 1 },
+                { position: [40.7128, -73.9458], label: 'Williamsburg', sequenceNumber: 2 },
+                { position: [40.6501, -73.9496], label: 'Park Slope', sequenceNumber: 3 },
               ]}
+              showRoute={true}
             />
           </div>
 
@@ -211,6 +212,7 @@ function App() {
           <p>✅ Story 4.1: Leaflet map integration</p>
           <p>✅ Story 4.2: Geocoding support for addresses</p>
           <p>✅ Story 4.3: Driver-specific order map views</p>
+          <p>✅ Story 4.4: Route sequence visualization</p>
         </div>
       </div>
     </div>

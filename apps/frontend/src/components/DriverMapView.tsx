@@ -20,12 +20,14 @@ export function DriverMapView() {
     (order) => order.status === OrderStatus.ASSIGNED || order.status === OrderStatus.IN_TRANSIT
   );
 
-  // Convert orders to map markers
+  // Convert orders to map markers with sequence numbers
+  // Story 4.4: Add sequence numbers for route visualization
   const markers: MapMarker[] = activeOrders
     .filter((order) => order.latitude !== null && order.longitude !== null)
-    .map((order) => ({
+    .map((order, index) => ({
       position: [order.latitude!, order.longitude!],
       label: `${order.customerName} - ${order.deliveryAddress}`,
+      sequenceNumber: index + 1, // Story 4.4: Sequential numbering
     }));
 
   const selectedDriver = drivers.find((d) => d.id === selectedDriverId);
@@ -92,8 +94,13 @@ export function DriverMapView() {
             <div className="mb-2 text-sm text-muted-foreground">
               Showing {markers.length} active deliver{markers.length === 1 ? 'y' : 'ies'} for{' '}
               {selectedDriver?.name}
+              {markers.length > 1 && (
+                <span className="ml-2 text-blue-600">
+                  • Route sequence shown
+                </span>
+              )}
             </div>
-            <Map markers={markers} fitBounds={true} />
+            <Map markers={markers} fitBounds={true} showRoute={true} />
           </div>
         )}
 
