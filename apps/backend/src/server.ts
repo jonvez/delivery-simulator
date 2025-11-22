@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import winston from 'winston';
 import prisma from './db/client';
 import { checkDatabaseConnection, formatHealthCheckResponse } from './utils/healthCheck';
+import orderRoutes from './routes/order.routes';
 
 // Load environment variables
 dotenv.config();
@@ -63,6 +64,9 @@ app.get('/api/health', async (_req: Request, res: Response, next: NextFunction) 
     next(error);
   }
 });
+
+// API Routes
+app.use('/api/orders', orderRoutes);
 
 // Error handling middleware
 interface ErrorWithStatus extends Error {

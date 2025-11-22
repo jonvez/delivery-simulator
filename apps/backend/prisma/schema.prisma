@@ -19,3 +19,33 @@ model HealthCheck {
 
   @@map("health_checks")
 }
+
+// Order model - Story 2.1
+enum OrderStatus {
+  PENDING
+  ASSIGNED
+  IN_TRANSIT
+  DELIVERED
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  customerName    String
+  customerPhone   String
+  deliveryAddress String
+  orderDetails    String?
+  status          OrderStatus @default(PENDING)
+
+  // Lifecycle timestamps
+  createdAt       DateTime    @default(now())
+  assignedAt      DateTime?
+  inTransitAt     DateTime?
+  deliveredAt     DateTime?
+
+  // For soft deletes or audit trail
+  updatedAt       DateTime    @updatedAt
+
+  @@map("orders")
+  @@index([status])
+  @@index([createdAt])
+}
