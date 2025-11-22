@@ -2,13 +2,24 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Card } from './ui/card';
 import { useDrivers } from '../hooks/useDrivers';
+import { useUpdateDriver } from '../hooks/useUpdateDriver';
 
 /**
  * Component for displaying list of all drivers
  * Story 3.2: Build Driver Management UI
+ * Story 3.3: Implement Driver Availability Toggle
  */
 export function DriverList() {
   const { drivers, loading, error, refetch } = useDrivers();
+  const { updateDriver, loading: updating } = useUpdateDriver();
+
+  const handleToggleAvailability = async (driverId: string, currentAvailability: boolean) => {
+    const updated = await updateDriver(driverId, { isAvailable: !currentAvailability });
+    if (updated) {
+      // Refresh the driver list to show updated availability
+      refetch();
+    }
+  };
 
   if (loading) {
     return (
@@ -59,19 +70,29 @@ export function DriverList() {
       <div className="space-y-2">
         {drivers.map((driver) => (
           <Card key={driver.id} className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex-1">
                 <h4 className="font-medium">{driver.name}</h4>
                 <p className="text-sm text-gray-500">
                   Added {new Date(driver.createdAt).toLocaleDateString()}
                 </p>
               </div>
-              <Badge
-                variant={driver.isAvailable ? 'default' : 'secondary'}
-                className={driver.isAvailable ? 'bg-green-600' : ''}
-              >
-                {driver.isAvailable ? 'Available' : 'Unavailable'}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant={driver.isAvailable ? 'default' : 'secondary'}
+                  className={driver.isAvailable ? 'bg-green-600' : ''}
+                >
+                  {driver.isAvailable ? 'Available' : 'Unavailable'}
+                </Badge>
+                <Button
+                  onClick={() => handleToggleAvailability(driver.id, driver.isAvailable)}
+                  variant="outline"
+                  size="sm"
+                  disabled={updating}
+                >
+                  {driver.isAvailable ? 'Mark Unavailable' : 'Mark Available'}
+                </Button>
+              </div>
             </div>
           </Card>
         ))}

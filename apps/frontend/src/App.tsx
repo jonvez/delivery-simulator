@@ -173,6 +173,7 @@ function App() {
           <p>✅ Story 2.3: Order list with status grouping</p>
           <p>✅ Story 3.1: Driver database schema and API endpoints</p>
           <p>✅ Story 3.2: Driver management UI</p>
+          <p>✅ Story 3.3: Driver availability toggle</p>
         </div>
       </div>
     </div>
