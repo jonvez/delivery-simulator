@@ -54,7 +54,7 @@ delivery-simulator/
 
 - Node.js 20 LTS or higher
 - npm 10+
-- PostgreSQL 14+ (local or Docker)
+- Docker (recommended) OR PostgreSQL 14+ installed locally
 - Git
 
 ### Installation
@@ -76,15 +76,28 @@ cp apps/backend/.env.example apps/backend/.env
 # Edit apps/backend/.env with your database credentials
 ```
 
-4. Set up the database (instructions in Story 1.3):
+4. Start the PostgreSQL database:
+
+**Option A: Using Docker (Recommended)**
+```bash
+docker compose up -d
+```
+
+**Option B: Using Local PostgreSQL**
+```bash
+# Ensure PostgreSQL 14+ is installed and running
+createdb delivery_manager
+```
+
+5. Run database migrations:
 ```bash
 cd apps/backend
 npx prisma migrate dev
-npx prisma db seed
 ```
 
-5. Start development servers:
+6. Start development servers:
 ```bash
+cd ../..
 npm run dev
 ```
 
