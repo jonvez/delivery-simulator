@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
-import { LatLngExpression, LatLngBounds, DivIcon } from 'leaflet';
+import type { LatLngExpression, LatLngBounds, DivIcon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Card } from '@/components/ui/card';
 
