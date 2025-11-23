@@ -19,33 +19,47 @@ function App() {
   const { data, loading, error, refetch } = useHealthCheck();
 
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight">Delivery Manager</h1>
-          <p className="text-muted-foreground">
-            Restaurant delivery operations management system
-          </p>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b bg-card">
+        <div className="max-w-[1800px] mx-auto px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">Delivery Manager</h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Restaurant delivery operations dashboard
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              {data && (
+                <>
+                  <Badge variant="default" className="bg-green-600">
+                    API Connected
+                  </Badge>
+                  <Badge variant="default" className="bg-blue-600">
+                    DB Connected
+                  </Badge>
+                </>
+              )}
+              {error && (
+                <Badge variant="destructive">
+                  System Error
+                </Badge>
+              )}
+            </div>
+          </div>
         </div>
+      </header>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>System Health Check</CardTitle>
-            <CardDescription>
-              Full-stack connectivity status - frontend to backend to database
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {loading && (
-              <div className="flex items-center justify-center py-8">
-                <div className="text-muted-foreground">Loading health status...</div>
-              </div>
-            )}
+      <div className="max-w-[1800px] mx-auto p-8 space-y-8">{/* Main Dashboard Content */}
 
-            {error && (
+        {/* System Error Alert */}
+        {error && (
+          <Card className="border-destructive">
+            <CardContent className="pt-6">
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <Badge variant="destructive">Error</Badge>
+                  <Badge variant="destructive">System Error</Badge>
                   <span className="text-sm text-destructive">{error}</span>
                 </div>
                 <div className="p-4 bg-destructive/10 rounded-md text-sm">
@@ -59,70 +73,9 @@ function App() {
                   Retry Connection
                 </Button>
               </div>
-            )}
-
-            {data && !loading && !error && (
-              <div className="space-y-4">
-                <div className="grid gap-4">
-                  <div className="flex items-center justify-between p-4 border rounded-md">
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium">API Status</p>
-                      <p className="text-xs text-muted-foreground">
-                        Backend server connectivity
-                      </p>
-                    </div>
-                    <Badge variant={data.status === 'ok' ? 'default' : 'destructive'}>
-                      {data.status === 'ok' ? 'Connected' : 'Disconnected'}
-                    </Badge>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 border rounded-md">
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium">Database Status</p>
-                      <p className="text-xs text-muted-foreground">
-                        PostgreSQL connection via Prisma
-                      </p>
-                    </div>
-                    <Badge
-                      variant={
-                        data.database === 'connected' ? 'default' : 'destructive'
-                      }
-                    >
-                      {data.database === 'connected' ? 'Connected' : 'Disconnected'}
-                    </Badge>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 border rounded-md">
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium">Last Checked</p>
-                      <p className="text-xs text-muted-foreground">
-                        Server timestamp
-                      </p>
-                    </div>
-                    <span className="text-sm text-muted-foreground">
-                      {new Date(data.timestamp).toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <Button onClick={refetch} variant="outline" size="sm">
-                    Refresh Status
-                  </Button>
-                </div>
-
-                <div className="p-4 bg-primary/10 rounded-md">
-                  <p className="text-sm font-semibold text-primary mb-1">
-                    ✓ Full-stack connectivity verified
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Frontend (React) → Backend (Express) → Database (PostgreSQL)
-                  </p>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-6">
@@ -164,56 +117,57 @@ function App() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="space-y-6">
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold tracking-tight">Static Map</h2>
-              <p className="text-muted-foreground">
-                Interactive map showing delivery locations in Brooklyn, NY
-              </p>
-            </div>
-            <Map
-              markers={[
-                { position: [40.6782, -73.9442], label: 'Brooklyn Center', sequenceNumber: 1 },
-                { position: [40.7128, -73.9458], label: 'Williamsburg', sequenceNumber: 2 },
-                { position: [40.6501, -73.9496], label: 'Park Slope', sequenceNumber: 3 },
-              ]}
-              showRoute={true}
-            />
+        {/* Route Visualization Section */}
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">Route Visualization</h2>
+            <p className="text-sm text-muted-foreground">
+              View driver delivery routes and sequences on interactive maps
+            </p>
           </div>
-
-          <div className="space-y-6">
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold tracking-tight">Driver Deliveries</h2>
-              <p className="text-muted-foreground">
-                View assigned orders for each driver
-              </p>
-            </div>
-            <DriverMapView />
-          </div>
+          <DriverMapView />
         </div>
 
-        <div className="text-center text-sm text-muted-foreground space-y-1">
-          <p>✅ Story 1.1: Monorepo initialized</p>
-          <p>✅ Story 1.2: shadcn/ui and Tailwind CSS configured</p>
-          <p>✅ Story 1.3: PostgreSQL and Prisma ORM set up</p>
-          <p>✅ Story 1.4: Express API with health check endpoint</p>
-          <p>✅ Story 1.5: Frontend connected to backend</p>
-          <p>✅ Story 2.1: Order database schema and API endpoints</p>
-          <p>✅ Story 2.2: Create order form UI</p>
-          <p>✅ Story 2.3: Order list with status grouping</p>
-          <p>✅ Story 3.1: Driver database schema and API endpoints</p>
-          <p>✅ Story 3.2: Driver management UI</p>
-          <p>✅ Story 3.3: Driver availability toggle</p>
-          <p>✅ Story 3.4: Order-driver assignment relationship</p>
-          <p>✅ Story 3.5: Order assignment to drivers</p>
-          <p>✅ Story 3.6: Order reassignment</p>
-          <p>✅ Story 3.7: Driver-specific order views</p>
-          <p>✅ Story 4.1: Leaflet map integration</p>
-          <p>✅ Story 4.2: Geocoding support for addresses</p>
-          <p>✅ Story 4.3: Driver-specific order map views</p>
-          <p>✅ Story 4.4: Route sequence visualization</p>
-        </div>
+        {/* Footer */}
+        <footer className="border-t pt-8 mt-16">
+          <div className="text-center space-y-4">
+            <h3 className="text-sm font-semibold text-muted-foreground">
+              Completed Stories
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs text-muted-foreground">
+              <div className="space-y-1">
+                <p className="font-semibold text-foreground">Epic 1: Foundation</p>
+                <p>✅ 1.1: Monorepo</p>
+                <p>✅ 1.2: UI Framework</p>
+                <p>✅ 1.3: Database</p>
+                <p>✅ 1.4: API</p>
+                <p>✅ 1.5: Integration</p>
+              </div>
+              <div className="space-y-1">
+                <p className="font-semibold text-foreground">Epic 2: Orders</p>
+                <p>✅ 2.1: Schema & API</p>
+                <p>✅ 2.2: Order Form</p>
+                <p>✅ 2.3: Order List</p>
+              </div>
+              <div className="space-y-1">
+                <p className="font-semibold text-foreground">Epic 3: Drivers</p>
+                <p>✅ 3.1: Schema & API</p>
+                <p>✅ 3.2: Driver UI</p>
+                <p>✅ 3.3: Availability</p>
+                <p>✅ 3.4: Assignment</p>
+                <p>✅ 3.5-3.7: Management</p>
+              </div>
+              <div className="space-y-1">
+                <p className="font-semibold text-foreground">Epic 4: Maps & Dashboard</p>
+                <p>✅ 4.1: Leaflet Maps</p>
+                <p>✅ 4.2: Geocoding</p>
+                <p>✅ 4.3: Driver Maps</p>
+                <p>✅ 4.4: Route Viz</p>
+                <p>✅ 4.5: Dashboard</p>
+              </div>
+            </div>
+          </div>
+        </footer>
       </div>
     </div>
   );
