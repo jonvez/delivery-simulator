@@ -14,6 +14,7 @@ import { DriverForm } from '@/components/DriverForm';
 import { DriverList } from '@/components/DriverList';
 import { Map } from '@/components/Map';
 import { DriverMapView } from '@/components/DriverMapView';
+import { DataManagement } from '@/components/DataManagement';
 
 function App() {
   const { data, loading, error, refetch } = useHealthCheck();
@@ -128,13 +129,24 @@ function App() {
           <DriverMapView />
         </div>
 
+        {/* Data Management Section */}
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">Data Management</h2>
+            <p className="text-sm text-muted-foreground">
+              Reset and regenerate demo data for testing
+            </p>
+          </div>
+          <DataManagement />
+        </div>
+
         {/* Footer */}
         <footer className="border-t pt-8 mt-16">
           <div className="text-center space-y-4">
             <h3 className="text-sm font-semibold text-muted-foreground">
               Completed Stories
             </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs text-muted-foreground">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs text-muted-foreground">
               <div className="space-y-1">
                 <p className="font-semibold text-foreground">Epic 1: Foundation</p>
                 <p>✅ 1.1: Monorepo</p>
@@ -164,6 +176,12 @@ function App() {
                 <p>✅ 4.3: Driver Maps</p>
                 <p>✅ 4.4: Route Viz</p>
                 <p>✅ 4.5: Dashboard</p>
+              </div>
+              <div className="space-y-1">
+                <p className="font-semibold text-foreground">Epic 5: Data & QA</p>
+                <p>✅ 5.1: Brooklyn Addresses</p>
+                <p>✅ 5.2: Seed Generation</p>
+                <p>✅ 5.3: Data Reset</p>
               </div>
             </div>
           </div>

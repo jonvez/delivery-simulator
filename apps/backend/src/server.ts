@@ -6,6 +6,7 @@ import prisma from './db/client';
 import { checkDatabaseConnection, formatHealthCheckResponse } from './utils/healthCheck';
 import orderRoutes from './routes/order.routes';
 import driverRoutes from './routes/driver.routes';
+import dataRoutes from './routes/data.routes';
 
 // Load environment variables
 dotenv.config();
@@ -69,6 +70,7 @@ app.get('/api/health', async (_req: Request, res: Response, next: NextFunction) 
 // API Routes
 app.use('/api/orders', orderRoutes);
 app.use('/api/drivers', driverRoutes);
+app.use('/api/data', dataRoutes);
 
 // Error handling middleware
 interface ErrorWithStatus extends Error {
