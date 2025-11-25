@@ -11,7 +11,7 @@ import { Prisma } from '@prisma/client';
 const router = Router();
 
 // POST /api/orders - Create a new order
-router.post('/', async (req: Request, res: Response, next: NextFunction) => {
+router.post('/', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const validatedData = createOrderSchema.parse(req.body);
     const order = await orderService.createOrder(validatedData);
@@ -19,17 +19,18 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
     res.status(201).json(order);
   } catch (error) {
     if (error instanceof ZodError) {
-      return res.status(400).json({
+      res.status(400).json({
         error: 'Validation failed',
         details: error.errors,
       });
+      return;
     }
     next(error);
   }
 });
 
 // GET /api/orders - Get all orders with optional filtering
-router.get('/', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const validatedQuery = orderQuerySchema.parse(req.query);
     const orders = await orderService.getAllOrders(validatedQuery);
@@ -37,10 +38,11 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     res.json(orders);
   } catch (error) {
     if (error instanceof ZodError) {
-      return res.status(400).json({
+      res.status(400).json({
         error: 'Invalid query parameters',
         details: error.errors,
       });
+      return;
     }
     next(error);
   }
@@ -50,15 +52,16 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
 // Story 3.5: Implement Order Assignment to Drivers
 // Story 3.6: Extended to support reassignment
 // IMPORTANT: This route must come BEFORE /:id routes to avoid path matching issues
-router.patch('/:id/assign', async (req: Request, res: Response, next: NextFunction) => {
+router.patch('/:id/assign', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id } = req.params;
     const { driverId } = req.body;
 
     if (!driverId || typeof driverId !== 'string') {
-      return res.status(400).json({
+      res.status(400).json({
         error: 'driverId is required and must be a string',
       });
+      return;
     }
 
     const order = await orderService.assignOrderToDriver(id, driverId);
@@ -67,23 +70,28 @@ router.patch('/:id/assign', async (req: Request, res: Response, next: NextFuncti
   } catch (error) {
     if (error instanceof Error) {
       if (error.message === 'Order not found') {
-        return res.status(404).json({ error: 'Order not found' });
+        res.status(404).json({ error: 'Order not found' });
+        return;
       }
       if (error.message === 'Driver not found') {
-        return res.status(404).json({ error: 'Driver not found' });
+        res.status(404).json({ error: 'Driver not found' });
+        return;
       }
       if (error.message === 'Driver is not available for assignment') {
-        return res.status(400).json({ error: 'Driver is not available for assignment' });
+        res.status(400).json({ error: 'Driver is not available for assignment' });
+        return;
       }
       if (error.message === 'Cannot reassign a delivered order') {
-        return res.status(400).json({ error: 'Cannot reassign a delivered order' });
+        res.status(400).json({ error: 'Cannot reassign a delivered order' });
+        return;
       }
     }
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2025') {
-        return res.status(404).json({
+        res.status(404).json({
           error: 'Order not found',
         });
+        return;
       }
     }
     next(error);
@@ -91,15 +99,16 @@ router.patch('/:id/assign', async (req: Request, res: Response, next: NextFuncti
 });
 
 // GET /api/orders/:id - Get a single order by ID
-router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/:id', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id } = req.params;
     const order = await orderService.getOrderById(id);
 
     if (!order) {
-      return res.status(404).json({
+      res.status(404).json({
         error: 'Order not found',
       });
+      return;
     }
 
     res.json(order);
@@ -109,7 +118,7 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
 });
 
 // PATCH /api/orders/:id - Update an order
-router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => {
+router.patch('/:id', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id } = req.params;
     const validatedData = updateOrderSchema.parse(req.body);
@@ -119,16 +128,18 @@ router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => 
     res.json(order);
   } catch (error) {
     if (error instanceof ZodError) {
-      return res.status(400).json({
+      res.status(400).json({
         error: 'Validation failed',
         details: error.errors,
       });
+      return;
     }
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2025') {
-        return res.status(404).json({
+        res.status(404).json({
           error: 'Order not found',
         });
+        return;
       }
     }
     next(error);
@@ -136,7 +147,7 @@ router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => 
 });
 
 // DELETE /api/orders/:id - Delete an order
-router.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
+router.delete('/:id', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id } = req.params;
     await orderService.deleteOrder(id);
@@ -145,9 +156,10 @@ router.delete('/:id', async (req: Request, res: Response, next: NextFunction) =>
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2025') {
-        return res.status(404).json({
+        res.status(404).json({
           error: 'Order not found',
         });
+        return;
       }
     }
     next(error);

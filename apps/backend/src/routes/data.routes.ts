@@ -12,7 +12,7 @@ const router = Router();
  * POST /api/data/reset
  * Reset all data and regenerate seed data
  */
-router.post('/reset', async (req: Request, res: Response) => {
+router.post('/reset', async (_req: Request, res: Response) => {
   try {
     console.log('Resetting all data...');
 
