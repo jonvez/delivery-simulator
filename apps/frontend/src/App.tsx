@@ -12,12 +12,11 @@ import { OrderForm } from '@/components/OrderForm';
 import { OrderList } from '@/components/OrderList';
 import { DriverForm } from '@/components/DriverForm';
 import { DriverList } from '@/components/DriverList';
-import { Map } from '@/components/Map';
 import { DriverMapView } from '@/components/DriverMapView';
 import { DataManagement } from '@/components/DataManagement';
 
 function App() {
-  const { data, loading, error, refetch } = useHealthCheck();
+  const { data, error, refetch } = useHealthCheck();
 
   return (
     <div className="min-h-screen bg-background">
