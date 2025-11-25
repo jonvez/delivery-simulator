@@ -9,6 +9,7 @@
     "start": "node dist/server.js",
     "seed": "tsx src/scripts/seed.ts",
     "test": "jest",
+    "test:integration": "jest --testPathPattern=__tests__/.*.routes.test.ts --runInBand",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "lint": "eslint src --ext .ts"
@@ -30,6 +31,7 @@
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.14",
     "@types/node": "^20.10.6",
+    "@types/pg": "^8.15.6",
     "@types/supertest": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^6.17.0",
     "@typescript-eslint/parser": "^6.17.0",

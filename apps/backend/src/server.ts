@@ -109,31 +109,33 @@ app.use((_req: Request, res: Response) => {
   });
 });
 
-// Graceful shutdown
-const server = app.listen(PORT, () => {
-  logger.info(`Server running on port ${PORT} in ${NODE_ENV} mode`);
-});
-
-process.on('SIGTERM', async () => {
-  logger.info('SIGTERM signal received: closing HTTP server');
-  server.close(() => {
-    logger.info('HTTP server closed');
+// Only start server if this file is run directly (not imported for tests)
+if (require.main === module) {
+  const server = app.listen(PORT, () => {
+    logger.info(`Server running on port ${PORT} in ${NODE_ENV} mode`);
   });
 
-  await prisma.$disconnect();
-  logger.info('Database connection closed');
-  process.exit(0);
-});
+  process.on('SIGTERM', async () => {
+    logger.info('SIGTERM signal received: closing HTTP server');
+    server.close(() => {
+      logger.info('HTTP server closed');
+    });
 
-process.on('SIGINT', async () => {
-  logger.info('SIGINT signal received: closing HTTP server');
-  server.close(() => {
-    logger.info('HTTP server closed');
+    await prisma.$disconnect();
+    logger.info('Database connection closed');
+    process.exit(0);
   });
 
-  await prisma.$disconnect();
-  logger.info('Database connection closed');
-  process.exit(0);
-});
+  process.on('SIGINT', async () => {
+    logger.info('SIGINT signal received: closing HTTP server');
+    server.close(() => {
+      logger.info('HTTP server closed');
+    });
+
+    await prisma.$disconnect();
+    logger.info('Database connection closed');
+    process.exit(0);
+  });
+}
 
 export default app;

@@ -18,7 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { API_BASE_URL } from '@/config';
+import { API_BASE_URL } from '@/lib/api';
 
 /**
  * Data Management Component

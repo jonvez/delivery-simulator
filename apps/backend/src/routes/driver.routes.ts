@@ -129,8 +129,8 @@ router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => 
  */
 router.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const driver = await driverService.deleteDriver(req.params.id);
-    res.json(driver);
+    await driverService.deleteDriver(req.params.id);
+    res.status(204).send();
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
       return res.status(404).json({

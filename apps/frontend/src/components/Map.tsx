@@ -1,11 +1,9 @@
 import { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
-import type { LatLngExpression, LatLngBounds, DivIcon } from 'leaflet';
+import type { LatLngExpression, DivIcon } from 'leaflet';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Card } from '@/components/ui/card';
-
-// Fix for default marker icons in react-leaflet
-import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
@@ -69,7 +67,7 @@ function FitBounds({ markers }: { markers: MapMarker[] }) {
 
   useEffect(() => {
     if (markers.length > 0) {
-      const bounds = new LatLngBounds(markers.map(m => m.position as [number, number]));
+      const bounds = L.latLngBounds(markers.map(m => m.position as [number, number]));
       map.fitBounds(bounds, { padding: [50, 50] });
     }
   }, [markers, map]);
