@@ -111,7 +111,7 @@ app.use((_req: Request, res: Response) => {
 
 // Only start server if this file is run directly (not imported for tests)
 if (require.main === module) {
-  const server = app.listen(PORT, () => {
+  const server = app.listen(Number(PORT), '0.0.0.0', () => {
     logger.info(`Server running on port ${PORT} in ${NODE_ENV} mode`);
   });
 
