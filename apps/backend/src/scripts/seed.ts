@@ -1,65 +1,15 @@
 import prisma from '../db/client';
 import { OrderStatus } from '@prisma/client';
 import { BROOKLYN_ADDRESSES } from '../data/brooklyn-addresses';
+import { REP_NAMES, STORE_ACCOUNTS, DELIVERY_ITEMS } from '../data/dsd-seed-data';
 
 /**
  * Seed Data Generation Script
  * Story 5.2: Build Seed Data Generation System
  *
- * Creates realistic sample drivers and orders for demonstration purposes.
- * Run with: npm run seed
+ * Creates realistic sample route reps and store deliveries for demonstration
+ * purposes. Seed content lives in ../data/dsd-seed-data. Run with: npm run seed
  */
-
-// Sample driver names
-const DRIVER_NAMES = [
-  'Mike Chen',
-  'Sarah Johnson',
-  'David Rodriguez',
-  'Emily Williams',
-  'James Thompson',
-  'Maria Garcia',
-  'Alex Kim',
-  'Jessica Martinez',
-];
-
-// Sample customer names
-const CUSTOMER_NAMES = [
-  'John Smith',
-  'Emma Davis',
-  'Michael Brown',
-  'Olivia Miller',
-  'William Wilson',
-  'Sophia Moore',
-  'James Taylor',
-  'Isabella Anderson',
-  'Robert Thomas',
-  'Mia Jackson',
-  'Daniel White',
-  'Charlotte Harris',
-  'Matthew Martin',
-  'Amelia Thompson',
-  'Christopher Garcia',
-  'Harper Martinez',
-];
-
-// Sample order details
-const ORDER_DETAILS = [
-  '2 Large Pepperoni Pizzas, 1 Garlic Knots',
-  'General Tso Chicken, Fried Rice, Spring Rolls',
-  'Burger Deluxe Meal with Fries',
-  'Pad Thai, Tom Yum Soup, Spring Rolls',
-  'Caesar Salad, Grilled Chicken Sandwich',
-  'Sushi Combo (24 pieces), Miso Soup',
-  'BBQ Ribs Platter, Mac & Cheese',
-  'Vegetarian Bowl, Fresh Juice',
-  'Tacos (6), Chips and Guacamole',
-  'Chicken Tikka Masala, Naan Bread',
-  'Margherita Pizza, Caprese Salad',
-  'Philly Cheesesteak, Onion Rings',
-  'Greek Gyro Platter with Fries',
-  'Chicken Wings (20), Blue Cheese',
-  'Seafood Pasta, Garlic Bread',
-];
 
 /**
  * Get a random item from an array
@@ -100,9 +50,9 @@ async function main() {
   await prisma.driver.deleteMany({});
   console.log('✓ Existing data cleared\n');
 
-  // Create drivers
-  console.log('👷 Creating drivers...');
-  const driverData = DRIVER_NAMES.slice(0, 5 + Math.floor(Math.random() * 4)).map((name, index) => ({
+  // Create route reps
+  console.log('🚚 Creating route reps...');
+  const driverData = REP_NAMES.slice(0, 5 + Math.floor(Math.random() * 4)).map((name, index) => ({
     name,
     isAvailable: index < 3 || Math.random() > 0.4, // First 3 available, rest random
   }));
@@ -111,14 +61,14 @@ async function main() {
     driverData.map((data) => prisma.driver.create({ data }))
   );
 
-  console.log(`✓ Created ${drivers.length} drivers:`);
+  console.log(`✓ Created ${drivers.length} route reps:`);
   drivers.forEach((driver) => {
-    console.log(`  - ${driver.name} (${driver.isAvailable ? 'Available' : 'Unavailable'})`);
+    console.log(`  - ${driver.name} (${driver.isAvailable ? 'On route' : 'Off route'})`);
   });
   console.log('');
 
-  // Create orders
-  console.log('📦 Creating orders...');
+  // Create store deliveries
+  console.log('📦 Creating store deliveries...');
   const orderCount = 15 + Math.floor(Math.random() * 11); // 15-25 orders
   const availableDrivers = drivers.filter(d => d.isAvailable);
 
@@ -160,10 +110,10 @@ async function main() {
 
     const order = await prisma.order.create({
       data: {
-        customerName: randomItem(CUSTOMER_NAMES),
+        customerName: randomItem(STORE_ACCOUNTS),
         customerPhone: randomPhone(),
         deliveryAddress: address.address,
-        orderDetails: Math.random() > 0.2 ? randomItem(ORDER_DETAILS) : null, // 80% have details
+        orderDetails: Math.random() > 0.2 ? randomItem(DELIVERY_ITEMS) : null, // 80% have a case list
         status,
         latitude: address.latitude,
         longitude: address.longitude,
@@ -178,24 +128,24 @@ async function main() {
     orders.push(order);
   }
 
-  console.log(`✓ Created ${orders.length} orders:`);
+  console.log(`✓ Created ${orders.length} store deliveries:`);
   const statusCounts = {
     [OrderStatus.PENDING]: orders.filter(o => o.status === OrderStatus.PENDING).length,
     [OrderStatus.ASSIGNED]: orders.filter(o => o.status === OrderStatus.ASSIGNED).length,
     [OrderStatus.IN_TRANSIT]: orders.filter(o => o.status === OrderStatus.IN_TRANSIT).length,
     [OrderStatus.DELIVERED]: orders.filter(o => o.status === OrderStatus.DELIVERED).length,
   };
-  console.log(`  - Pending: ${statusCounts.PENDING}`);
+  console.log(`  - Scheduled: ${statusCounts.PENDING}`);
   console.log(`  - Assigned: ${statusCounts.ASSIGNED}`);
-  console.log(`  - In Transit: ${statusCounts.IN_TRANSIT}`);
+  console.log(`  - En route: ${statusCounts.IN_TRANSIT}`);
   console.log(`  - Delivered: ${statusCounts.DELIVERED}`);
   console.log('');
 
   console.log('✨ Seed data generation complete!\n');
   console.log('Summary:');
-  console.log(`  👷 ${drivers.length} drivers created`);
-  console.log(`  📦 ${orders.length} orders created`);
-  console.log(`  🗺️  ${new Set(orders.map(o => o.deliveryAddress)).size} unique Brooklyn locations`);
+  console.log(`  🚚 ${drivers.length} route reps created`);
+  console.log(`  📦 ${orders.length} store deliveries created`);
+  console.log(`  🗺️  ${new Set(orders.map(o => o.deliveryAddress)).size} unique store locations (Brooklyn)`);
 }
 
 main()

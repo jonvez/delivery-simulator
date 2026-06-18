@@ -1,62 +1,15 @@
 import prisma from '../db/client';
 import { OrderStatus } from '@prisma/client';
 import { BROOKLYN_ADDRESSES } from '../data/brooklyn-addresses';
+import { REP_NAMES, STORE_ACCOUNTS, DELIVERY_ITEMS } from '../data/dsd-seed-data';
 
 /**
  * Data Management Service
  * Story 5.3: Implement Data Reset Functionality
  *
- * Provides data reset and regeneration capabilities
+ * Provides data reset and regeneration capabilities. Seed content (route reps,
+ * convenience-store accounts, case-drops) lives in ../data/dsd-seed-data.
  */
-
-// Sample data arrays
-const DRIVER_NAMES = [
-  'Mike Chen',
-  'Sarah Johnson',
-  'David Rodriguez',
-  'Emily Williams',
-  'James Thompson',
-  'Maria Garcia',
-  'Alex Kim',
-  'Jessica Martinez',
-];
-
-const CUSTOMER_NAMES = [
-  'John Smith',
-  'Emma Davis',
-  'Michael Brown',
-  'Olivia Miller',
-  'William Wilson',
-  'Sophia Moore',
-  'James Taylor',
-  'Isabella Anderson',
-  'Robert Thomas',
-  'Mia Jackson',
-  'Daniel White',
-  'Charlotte Harris',
-  'Matthew Martin',
-  'Amelia Thompson',
-  'Christopher Garcia',
-  'Harper Martinez',
-];
-
-const ORDER_DETAILS = [
-  '2 Large Pepperoni Pizzas, 1 Garlic Knots',
-  'General Tso Chicken, Fried Rice, Spring Rolls',
-  'Burger Deluxe Meal with Fries',
-  'Pad Thai, Tom Yum Soup, Spring Rolls',
-  'Caesar Salad, Grilled Chicken Sandwich',
-  'Sushi Combo (24 pieces), Miso Soup',
-  'BBQ Ribs Platter, Mac & Cheese',
-  'Vegetarian Bowl, Fresh Juice',
-  'Tacos (6), Chips and Guacamole',
-  'Chicken Tikka Masala, Naan Bread',
-  'Margherita Pizza, Caprese Salad',
-  'Philly Cheesesteak, Onion Rings',
-  'Greek Gyro Platter with Fries',
-  'Chicken Wings (20), Blue Cheese',
-  'Seafood Pasta, Garlic Bread',
-];
 
 /**
  * Get a random item from an array
@@ -99,7 +52,7 @@ export async function resetData(): Promise<{
     await tx.driver.deleteMany({});
 
     // Create drivers (5-8 drivers)
-    const driverData = DRIVER_NAMES.slice(0, 5 + Math.floor(Math.random() * 4)).map((name, index) => ({
+    const driverData = REP_NAMES.slice(0, 5 + Math.floor(Math.random() * 4)).map((name, index) => ({
       name,
       isAvailable: index < 3 || Math.random() > 0.4, // First 3 available, rest random
     }));
@@ -150,10 +103,10 @@ export async function resetData(): Promise<{
 
       const order = await tx.order.create({
         data: {
-          customerName: randomItem(CUSTOMER_NAMES),
+          customerName: randomItem(STORE_ACCOUNTS),
           customerPhone: randomPhone(),
           deliveryAddress: address.address,
-          orderDetails: Math.random() > 0.2 ? randomItem(ORDER_DETAILS) : null,
+          orderDetails: Math.random() > 0.2 ? randomItem(DELIVERY_ITEMS) : null,
           status,
           latitude: address.latitude,
           longitude: address.longitude,
