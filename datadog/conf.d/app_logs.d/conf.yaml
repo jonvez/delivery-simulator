@@ -1,0 +1,5 @@
+logs:
+  - type: file
+    path: /host/app/logs/app.log
+    service: delivery-simulator
+    source: nodejs

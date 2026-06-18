@@ -10,11 +10,39 @@ services:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./datadog/postgres/init-datadog-user.sql:/docker-entrypoint-initdb.d/init-datadog-user.sql:ro
     healthcheck:
       test: ['CMD', 'pg_isready', '-U', 'postgres']
       interval: 10s
       timeout: 5s
       retries: 5
+
+  datadog-agent:
+    image: gcr.io/datadoghq/agent:7
+    container_name: datadog-agent
+    environment:
+      - DD_API_KEY=${DD_API_KEY}
+      - DD_SITE=${DD_SITE:-us5.datadoghq.com}
+      - DD_ENV=${DD_ENV:-development}
+      - DD_SERVICE=${DD_SERVICE:-delivery-simulator}
+      - DD_VERSION=${DD_VERSION:-0.1.0}
+      - DD_APM_ENABLED=true
+      - DD_APM_NON_LOCAL_TRAFFIC=true
+      - DD_LOGS_ENABLED=true
+      - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+      - DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
+      - DD_PROCESS_AGENT_ENABLED=false
+      - DD_PROCESS_AGENT_RUNNER_ENABLED=false
+      - DD_PROCESS_CONFIG_PROCESS_COLLECTION_ENABLED=false
+      - DD_PROCESS_CONFIG_CONTAINER_COLLECTION_ENABLED=false
+    ports:
+      - '8126:8126'
+      - '8125:8125/udp'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./datadog/conf.d:/etc/datadog-agent/conf.d:ro
+      - ./logs:/host/app/logs:ro
+      - ./datadog/fake-proc:/host/proc:ro
 
 volumes:
   postgres_data:

@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import winston from 'winston';
 import prisma from './db/client';
 import { checkDatabaseConnection, formatHealthCheckResponse } from './utils/healthCheck';
@@ -31,6 +32,11 @@ const logger = winston.createLogger({
             winston.format.simple()
           )
         : winston.format.json(),
+    }),
+    new winston.transports.File({
+      filename: path.resolve(__dirname, '../../../logs/app.log'),
+      maxsize: 10 * 1024 * 1024, // 10MB rotation
+      maxFiles: 3,
     }),
   ],
 });
