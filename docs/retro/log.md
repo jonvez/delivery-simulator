@@ -17,3 +17,10 @@ Format: `### YYYY-MM-DD — short title` then bullets.
   verbatim vs. have to tailor? (Tailoring so far: stack swap, security examples, Datadog instead of
   an events table, an *Adoption* Gate instead of a greenfield Kickoff Gate because this is brownfield.)
 - Folded BMAD's `brief.md` + `prd.md` into a native `SPEC.md`; kept `docs/architecture/*` as reference.
+
+### 2026-06-19 — Process lesson: stage explicit paths, never `git add -A`
+- A `git add -A` while committing the BMAD migration swept in unrelated changes (Jon's uncommitted
+  `package-lock.json` + local `.obsidian/` editor state); had to rewrite history to unbundle.
+- **Rule:** stage explicit paths (`git add <path> …`), never `git add -A`/`git add .`, so commits
+  stay atomic and we never absorb someone's unrelated working-tree changes. Revisit (Jon) for a
+  durable home (global rule / hook).
