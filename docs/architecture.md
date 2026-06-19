@@ -1437,13 +1437,6 @@ delivery-simulator/
 │   ├── architecture/                # Sharded architecture docs
 │   └── qa/                          # QA test plans
 │
-├── .bmad-core/                      # BMad framework configuration
-│   ├── core-config.yaml
-│   ├── tasks/
-│   ├── templates/
-│   ├── checklists/
-│   └── data/
-│
 ├── tests/
 │   └── e2e/                         # Playwright E2E tests
 │       ├── orders.spec.ts
@@ -1468,7 +1461,7 @@ delivery-simulator/
 
 - **Monorepo with npm workspaces**: Single repository for frontend and backend
 - **Shared types package**: Common TypeScript types used by both apps (future enhancement)
-- **Sharded documentation**: BMad's sharded doc structure in `docs/prd/` and `docs/architecture/`
+- **Sharded documentation**: sharded doc structure in `docs/architecture/`
 - **Centralized testing**: E2E tests at root level; unit/integration tests colocated with apps
 - **Environment files**: `.env` files in each app directory, not committed to Git
 
@@ -3065,18 +3058,18 @@ This architecture is **ready for implementation** by the Dev agent. All major te
 **Immediate Actions:**
 
 1. **Validate Architecture**:
-   - Run `/BMad:architect-checklist` to validate completeness
+   - Review against `SPEC.md` and the ADR log (`docs/decisions/`) for completeness
    - Review any flagged gaps or concerns
    - Address any blockers before proceeding
 
-2. **Hand Off to Dev Agent**:
-   - Switch to `/BMad:agents:dev` agent
-   - Dev agent will load this architecture document
-   - Begin implementation of Epic 1: Project Setup and Foundation
+2. **Hand off to a Developer agent**:
+   - Dispatch the `developer` persona (see `TEAM.md`) with the target issue
+   - The developer loads this architecture document as reference
+   - Implement against the issue's acceptance criteria, test-first
 
 3. **Iterative Development**:
-   - Implement stories sequentially within each epic
-   - Run tests continuously (TDD approach where applicable)
+   - Pull issues from the board (Ready → In Progress), one at a time
+   - Run tests continuously (TDD per the Definition of Done)
    - Validate each feature against acceptance criteria
 
 **Post-MVP Enhancements** (deferred to future iterations):

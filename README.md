@@ -1,6 +1,6 @@
 # Delivery Manager Application
 
-A web-based system for managing restaurant delivery operations, built as a learning project using the BMad methodology.
+A web-based system for managing restaurant delivery operations.
 
 ## Overview
 
@@ -45,7 +45,6 @@ delivery-simulator/
 │   ├── brief.md          # Project brief
 │   ├── prd.md            # Product requirements
 │   └── architecture.md   # Technical architecture
-└── .bmad-core/           # BMad methodology configuration
 ```
 
 ## Getting Started
@@ -134,12 +133,10 @@ This will start both frontend (http://localhost:5173) and backend (http://localh
 
 ## Development Workflow
 
-This project follows the BMad methodology with clearly defined phases:
-1. **Analyst** - Project brief creation
-2. **PM** - Product requirements and user stories
-3. **Architect** - Technical design and architecture
-4. **Dev** - Implementation (current phase)
-5. **QA** - Quality assurance and testing
+This project is built by a small team of Claude Code persona subagents (Product Owner,
+Architect, Designer, Developers, QA) coordinated through a GitHub Projects board and an
+ADR log. See [`TEAM.md`](TEAM.md) for the full process and [`SPEC.md`](SPEC.md) for the
+product spec.
 
 ## Documentation
 

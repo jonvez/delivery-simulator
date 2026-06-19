@@ -104,13 +104,6 @@ delivery-simulator/
 │   ├── architecture/                # Sharded architecture docs
 │   └── qa/                          # QA test plans
 │
-├── .bmad-core/                      # BMad framework configuration
-│   ├── core-config.yaml
-│   ├── tasks/
-│   ├── templates/
-│   ├── checklists/
-│   └── data/
-│
 ├── tests/
 │   └── e2e/                         # Playwright E2E tests
 │       ├── orders.spec.ts
@@ -135,7 +128,7 @@ delivery-simulator/
 
 - **Monorepo with npm workspaces**: Single repository for frontend and backend
 - **Shared types package**: Common TypeScript types used by both apps (future enhancement)
-- **Sharded documentation**: BMad's sharded doc structure in `docs/prd/` and `docs/architecture/`
+- **Sharded documentation**: sharded doc structure in `docs/architecture/`
 - **Centralized testing**: E2E tests at root level; unit/integration tests colocated with apps
 - **Environment files**: `.env` files in each app directory, not committed to Git
 
