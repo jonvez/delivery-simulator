@@ -42,9 +42,11 @@ delivery-simulator/
 ├── tests/
 │   └── e2e/              # Playwright E2E tests
 ├── docs/                  # Project documentation
-│   ├── brief.md          # Project brief
-│   ├── prd.md            # Product requirements
-│   └── architecture.md   # Technical architecture
+│   ├── architecture.md   # Technical architecture
+│   ├── architecture/     # Sharded architecture docs
+│   └── decisions/        # ADR log
+├── SPEC.md               # Product spec (single source of truth)
+├── TEAM.md               # Build team & process
 ```
 
 ## Getting Started
@@ -140,9 +142,10 @@ product spec.
 
 ## Documentation
 
-- [Project Brief](docs/brief.md) - Executive summary and problem statement
-- [PRD](docs/prd.md) - Detailed product requirements
+- [Product Spec](SPEC.md) - Single source of product truth (folds the former brief + PRD)
 - [Architecture](docs/architecture.md) - Full technical architecture
+- [Decisions](docs/decisions/) - ADR log
+- [Process](TEAM.md) - Build team & process
 
 ## MVP Scope
 
@@ -466,7 +469,7 @@ All PRs must include appropriate tests:
 ### Questions?
 
 - Check existing issues and discussions
-- Review the [PRD](docs/prd.md) for feature context
+- Review the [Product Spec](SPEC.md) for feature context
 - Consult the [Architecture doc](docs/architecture.md) for technical decisions
 
 ---

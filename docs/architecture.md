@@ -1430,11 +1430,9 @@ delivery-simulator/
 │       └── tsconfig.json
 │
 ├── docs/                            # Project documentation
-│   ├── brief.md                     # Project Brief
-│   ├── prd.md                       # Product Requirements Document
 │   ├── architecture.md              # Architecture Document (this file)
-│   ├── prd/                         # Sharded PRD (epics)
 │   ├── architecture/                # Sharded architecture docs
+│   ├── decisions/                   # ADR log
 │   └── qa/                          # QA test plans
 │
 ├── tests/

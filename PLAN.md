@@ -82,10 +82,17 @@ cd ../.. && npm run dev      # frontend :5173, backend :3001
 - RUM `clientToken` in `index.html` is public-by-design (not a secret); `DD_API_KEY` stays in gitignored `.env`.
 - 3 OPEN vocabulary calls await Jon (Delivery vs Stop · Case List vs Items · On Route/Off Route vs Active/Inactive) — confirm before propagating to tests.
 - Cross-project: this demo is the artifact for the Pepper application tracked in job-search CRM (Opportunities row 73).
+- **Process migrated off BMAD → native team paradigm** (shared with `dinner-and-groceries`): see `TEAM.md`, `SPEC.md`, `docs/decisions/` (ADRs 0001–0003), `docs/retro/log.md`. The remaining DSD roadmap below is being filed as GitHub Project issues. Adoption Gate: team grooms/designs until Jon says **"start."**
 
 ---
 
 ## Session Log
+
+### 2026-06-19
+
+- Migrated the build process from **BMAD** to the **native persona-subagent paradigm** (the same one used on `dinner-and-groceries`). Removed `.bmad-core/`, `.cursor/rules/bmad/`, `.claude/commands/BMad/`; de-BMAD'd `README.md` + `docs/architecture*`.
+- Stood up native scaffolding: `TEAM.md`, `.claude/settings.json` allowlist, `docs/decisions/0001–0003`, `docs/retro/log.md`. Folded BMAD `brief.md` + `prd.md` into a native `SPEC.md`; kept `docs/architecture/*` as reference.
+- Next: create GitHub Project board + file the remaining DSD roadmap as issues; then session restart + "start."
 
 ### 2026-06-18
 
