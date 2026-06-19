@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Edit",
+      "Write",
+      "Bash(git:*)",
+      "Bash(gh issue:*)",
+      "Bash(gh pr:*)",
+      "Bash(gh project:*)",
+      "Bash(gh api:*)",
+      "Bash(gh repo view:*)",
+      "Bash(node:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(npx prisma:*)",
+      "Bash(playwright:*)",
+      "Bash(npx playwright:*)",
+      "Bash(tsc:*)",
+      "Bash(eslint:*)",
+      "Bash(prettier:*)",
+      "Bash(docker compose:*)",
+      "Bash(docker exec:*)"
+    ]
+  }
+}
