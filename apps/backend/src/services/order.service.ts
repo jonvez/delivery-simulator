@@ -8,6 +8,30 @@ type OrderWithDriver = Prisma.OrderGetPayload<{
   include: { driver: true };
 }>;
 
+/**
+ * A single stop in a store account's delivery history (Per-Account view).
+ * Issue #3 — the DSD account-management lens.
+ */
+export interface StoreHistoryStop {
+  id: string;
+  status: OrderStatus;
+  createdAt: string;
+  deliveredAt: string | null;
+}
+
+/**
+ * Per-store-account aggregate for the Per-Account view (Issue #3):
+ * delivery/stop history, total drops, and last-visit date.
+ */
+export interface StoreAccountAggregate {
+  storeAccount: string;
+  storeAddress: string;
+  totalStops: number;
+  totalDrops: number;
+  lastVisit: string | null;
+  history: StoreHistoryStop[];
+}
+
 export class OrderService {
   /**
    * Create a new order with status PENDING
@@ -139,6 +163,85 @@ export class OrderService {
     });
 
     return result;
+  }
+
+  /**
+   * Per-Account view aggregation (Issue #3 — DSD account-management lens).
+   *
+   * Groups all stops by store account (customerName) and returns, per account:
+   * full stop history (newest first), total stops, total drops (DELIVERED stops),
+   * and last-visit date (most recent deliveredAt). Aggregates existing data only —
+   * no schema/migration changes. Accounts are sorted by most recent visit first,
+   * with never-visited accounts last.
+   */
+  async getOrdersByStore(): Promise<StoreAccountAggregate[]> {
+    const orders = await prisma.order.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+
+    // Group by store account name. Map preserves first-seen (newest) ordering,
+    // which we rely on for picking the most recent store address.
+    const byAccount = new Map<string, Order[]>();
+    for (const order of orders) {
+      const existing = byAccount.get(order.customerName);
+      if (existing) {
+        existing.push(order);
+      } else {
+        byAccount.set(order.customerName, [order]);
+      }
+    }
+
+    const aggregates: StoreAccountAggregate[] = [];
+
+    for (const [storeAccount, unsortedOrders] of byAccount) {
+      // Sort each account's stops newest-first by creation time so the result is
+      // deterministic regardless of the query's row order.
+      const accountOrders = [...unsortedOrders].sort(
+        (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+      );
+
+      let totalDrops = 0;
+      let lastVisitMs: number | null = null;
+
+      for (const order of accountOrders) {
+        if (order.status === OrderStatus.DELIVERED) {
+          totalDrops += 1;
+        }
+        if (order.deliveredAt) {
+          const ms = order.deliveredAt.getTime();
+          if (lastVisitMs === null || ms > lastVisitMs) {
+            lastVisitMs = ms;
+          }
+        }
+      }
+
+      aggregates.push({
+        storeAccount,
+        // Most recent stop's address (first element, newest-first ordering).
+        storeAddress: accountOrders[0].deliveryAddress,
+        totalStops: accountOrders.length,
+        totalDrops,
+        lastVisit: lastVisitMs !== null ? new Date(lastVisitMs).toISOString() : null,
+        history: accountOrders.map((order) => ({
+          id: order.id,
+          status: order.status,
+          createdAt: order.createdAt.toISOString(),
+          deliveredAt: order.deliveredAt ? order.deliveredAt.toISOString() : null,
+        })),
+      });
+    }
+
+    // Sort accounts by most recent visit first; never-visited accounts go last.
+    aggregates.sort((a, b) => {
+      if (a.lastVisit === null && b.lastVisit === null) {
+        return a.storeAccount.localeCompare(b.storeAccount);
+      }
+      if (a.lastVisit === null) return 1;
+      if (b.lastVisit === null) return -1;
+      return b.lastVisit.localeCompare(a.lastVisit);
+    });
+
+    return aggregates;
   }
 
   /**

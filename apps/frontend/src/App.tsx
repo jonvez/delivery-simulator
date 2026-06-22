@@ -13,6 +13,7 @@ import { OrderList } from '@/components/OrderList';
 import { DriverForm } from '@/components/DriverForm';
 import { DriverList } from '@/components/DriverList';
 import { DriverMapView } from '@/components/DriverMapView';
+import { StoreHistory } from '@/components/StoreHistory';
 import { DataManagement } from '@/components/DataManagement';
 
 function App() {
@@ -126,6 +127,18 @@ function App() {
             </p>
           </div>
           <DriverMapView />
+        </div>
+
+        {/* Per-Account View Section */}
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">Store Accounts</h2>
+            <p className="text-sm text-muted-foreground">
+              Manage the account, not just the drop — delivery history, total drops, and last
+              visit per store account
+            </p>
+          </div>
+          <StoreHistory />
         </div>
 
         {/* Data Management Section */}
