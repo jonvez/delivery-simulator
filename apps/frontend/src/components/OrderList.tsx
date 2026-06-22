@@ -2,8 +2,9 @@ import { useMemo } from 'react';
 import { useOrders } from '@/hooks/useOrders';
 import { useDrivers } from '@/hooks/useDrivers';
 import { useAssignOrder } from '@/hooks/useAssignOrder';
+import { useReviewPlanogram } from '@/hooks/useReviewPlanogram';
 import { OrderCard } from './OrderCard';
-import type { Order } from '@/types/order';
+import type { Order, ReviewPlanogramInput } from '@/types/order';
 import { OrderStatus } from '@/types/order';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -41,11 +42,20 @@ export function OrderList() {
   const { orders, loading, error, refetch } = useOrders();
   const { drivers } = useDrivers();
   const { assignOrder, loading: assigning } = useAssignOrder();
+  const { reviewPlanogram, loading: reviewingPlanogram } = useReviewPlanogram();
 
   const handleAssignOrder = async (orderId: string, driverId: string) => {
     const result = await assignOrder(orderId, driverId);
     if (result) {
       // Refresh orders to show updated assignment
+      refetch();
+    }
+  };
+
+  const handleReviewPlanogram = async (orderId: string, input: ReviewPlanogramInput) => {
+    const result = await reviewPlanogram(orderId, input);
+    if (result) {
+      // Refresh so the saved review reflects on reload
       refetch();
     }
   };
@@ -155,6 +165,8 @@ export function OrderList() {
                   }
                   onAssignDriver={handleAssignOrder}
                   assigning={assigning}
+                  onReviewPlanogram={handleReviewPlanogram}
+                  reviewingPlanogram={reviewingPlanogram}
                 />
               ))}
             </div>

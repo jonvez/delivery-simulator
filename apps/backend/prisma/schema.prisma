@@ -40,6 +40,10 @@ model Order {
   latitude        Float?
   longitude       Float?
 
+  // Planogram-compliance check - Issue #4 (DSD merchandising touch)
+  planogramReviewed Boolean @default(false)
+  planogramNotes    String?
+
   // Assignment relationship - Story 3.4
   driverId        String?
   driver          Driver?     @relation(fields: [driverId], references: [id])

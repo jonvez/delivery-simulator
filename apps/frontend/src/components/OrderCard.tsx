@@ -1,16 +1,23 @@
 import { useState } from 'react';
-import type { Order } from '@/types/order';
+import type { Order, ReviewPlanogramInput } from '@/types/order';
 import type { Driver } from '@/types/driver';
 import { OrderStatus } from '@/types/order';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+
+const PLANOGRAM_NOTES_MAX = 1000;
 
 interface OrderCardProps {
   order: Order;
   availableDrivers?: Driver[];
   onAssignDriver?: (orderId: string, driverId: string) => void;
   assigning?: boolean;
+  onReviewPlanogram?: (orderId: string, input: ReviewPlanogramInput) => Promise<void> | void;
+  reviewingPlanogram?: boolean;
 }
 
 const statusColors: Record<OrderStatus, 'default' | 'secondary' | 'destructive' | 'outline'> = {
@@ -37,14 +44,38 @@ function formatDate(dateString: string | null): string {
   });
 }
 
-export function OrderCard({ order, availableDrivers = [], onAssignDriver, assigning = false }: OrderCardProps) {
+export function OrderCard({
+  order,
+  availableDrivers = [],
+  onAssignDriver,
+  assigning = false,
+  onReviewPlanogram,
+  reviewingPlanogram = false,
+}: OrderCardProps) {
   const [selectedDriverId, setSelectedDriverId] = useState<string | null>(null);
+
+  // Local, controlled state for the planogram-compliance review. Seeded from the
+  // order so a previously-saved review is reflected on (re)load.
+  const [planogramReviewed, setPlanogramReviewed] = useState<boolean>(order.planogramReviewed);
+  const [planogramNotes, setPlanogramNotes] = useState<string>(order.planogramNotes ?? '');
 
   const handleAssign = () => {
     if (selectedDriverId && onAssignDriver) {
       onAssignDriver(order.id, selectedDriverId);
       setSelectedDriverId(null);
     }
+  };
+
+  const planogramNotesId = `planogram-notes-${order.id}`;
+  const planogramToggleId = `planogram-reviewed-${order.id}`;
+
+  const handleSavePlanogram = () => {
+    if (!onReviewPlanogram) return;
+    const trimmed = planogramNotes.trim();
+    void onReviewPlanogram(order.id, {
+      planogramReviewed,
+      planogramNotes: trimmed === '' ? null : trimmed,
+    });
   };
 
   const isPending = order.status === OrderStatus.PENDING;
@@ -161,6 +192,56 @@ export function OrderCard({ order, availableDrivers = [], onAssignDriver, assign
             )}
           </div>
         )}
+
+        {/* Planogram-compliance review - Issue #4 */}
+        <div className="pt-2 border-t space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id={planogramToggleId}
+                checked={planogramReviewed}
+                onCheckedChange={(checked) => setPlanogramReviewed(checked === true)}
+                disabled={reviewingPlanogram}
+              />
+              <Label htmlFor={planogramToggleId} className="text-sm font-medium cursor-pointer">
+                Planogram reviewed
+              </Label>
+            </div>
+            {planogramReviewed && (
+              <Badge variant="secondary">Reviewed</Badge>
+            )}
+          </div>
+
+          <div className="space-y-1">
+            <Label
+              htmlFor={planogramNotesId}
+              className="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+            >
+              Compliance Notes
+            </Label>
+            <Textarea
+              id={planogramNotesId}
+              value={planogramNotes}
+              maxLength={PLANOGRAM_NOTES_MAX}
+              onChange={(e) => setPlanogramNotes(e.target.value)}
+              placeholder="Endcap reset, facings squared, out-of-stocks flagged…"
+              disabled={reviewingPlanogram}
+              className="text-sm"
+            />
+          </div>
+
+          {onReviewPlanogram && (
+            <Button
+              onClick={handleSavePlanogram}
+              disabled={reviewingPlanogram}
+              size="sm"
+              variant="outline"
+              className="w-full"
+            >
+              {reviewingPlanogram ? 'Saving…' : 'Save Planogram Review'}
+            </Button>
+          )}
+        </div>
 
         <div className="pt-2 border-t">
           <div className="grid grid-cols-2 gap-2 text-xs">

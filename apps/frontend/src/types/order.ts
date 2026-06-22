@@ -17,6 +17,9 @@ export interface Order {
   // Geocoding - Story 4.2
   latitude: number | null;
   longitude: number | null;
+  // Planogram-compliance check - Issue #4
+  planogramReviewed: boolean;
+  planogramNotes: string | null;
   driverId: string | null;
   driver: {
     id: string;
@@ -44,4 +47,10 @@ export interface UpdateOrderInput {
   deliveryAddress?: string;
   orderDetails?: string | null;
   status?: OrderStatus;
+}
+
+// Planogram-compliance review payload - Issue #4
+export interface ReviewPlanogramInput {
+  planogramReviewed: boolean;
+  planogramNotes?: string | null;
 }

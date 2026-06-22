@@ -295,6 +295,109 @@ describe('Order Routes Integration Tests', () => {
     });
   });
 
+  describe('PATCH /api/orders/:id/planogram', () => {
+    it('should mark a stop planogram-reviewed with notes and persist it', async () => {
+      const order = await testPrisma.order.create({
+        data: {
+          customerName: 'Planogram Test',
+          customerPhone: '+18888888888',
+          deliveryAddress: 'Planogram Address',
+          status: OrderStatus.IN_TRANSIT,
+        },
+      });
+
+      const response = await request(app)
+        .patch(`/api/orders/${order.id}/planogram`)
+        .send({ planogramReviewed: true, planogramNotes: 'Endcap reset, facings squared' })
+        .expect(200);
+
+      expect(response.body.planogramReviewed).toBe(true);
+      expect(response.body.planogramNotes).toBe('Endcap reset, facings squared');
+
+      // Reflects on reload (fresh read from DB)
+      const reloaded = await testPrisma.order.findUnique({ where: { id: order.id } });
+      expect(reloaded?.planogramReviewed).toBe(true);
+      expect(reloaded?.planogramNotes).toBe('Endcap reset, facings squared');
+    });
+
+    it('should default planogramReviewed to false on existing orders', async () => {
+      const order = await testPrisma.order.create({
+        data: {
+          customerName: 'Default Test',
+          customerPhone: '+18888888889',
+          deliveryAddress: 'Default Address',
+          status: OrderStatus.PENDING,
+        },
+      });
+
+      const reloaded = await testPrisma.order.findUnique({ where: { id: order.id } });
+      expect(reloaded?.planogramReviewed).toBe(false);
+      expect(reloaded?.planogramNotes).toBeNull();
+    });
+
+    it('should allow clearing the reviewed flag and notes', async () => {
+      const order = await testPrisma.order.create({
+        data: {
+          customerName: 'Clear Test',
+          customerPhone: '+18888888890',
+          deliveryAddress: 'Clear Address',
+          status: OrderStatus.PENDING,
+          planogramReviewed: true,
+          planogramNotes: 'old note',
+        },
+      });
+
+      const response = await request(app)
+        .patch(`/api/orders/${order.id}/planogram`)
+        .send({ planogramReviewed: false, planogramNotes: null })
+        .expect(200);
+
+      expect(response.body.planogramReviewed).toBe(false);
+      expect(response.body.planogramNotes).toBeNull();
+    });
+
+    it('should return 400 when planogramReviewed is missing', async () => {
+      const order = await testPrisma.order.create({
+        data: {
+          customerName: 'Validation Test',
+          customerPhone: '+18888888891',
+          deliveryAddress: 'Validation Address',
+          status: OrderStatus.PENDING,
+        },
+      });
+
+      await request(app)
+        .patch(`/api/orders/${order.id}/planogram`)
+        .send({ planogramNotes: 'no reviewed flag' })
+        .expect(400);
+    });
+
+    it('should return 400 when notes exceed the length bound', async () => {
+      const order = await testPrisma.order.create({
+        data: {
+          customerName: 'Length Test',
+          customerPhone: '+18888888892',
+          deliveryAddress: 'Length Address',
+          status: OrderStatus.PENDING,
+        },
+      });
+
+      await request(app)
+        .patch(`/api/orders/${order.id}/planogram`)
+        .send({ planogramReviewed: true, planogramNotes: 'x'.repeat(1001) })
+        .expect(400);
+    });
+
+    it('should return 404 for a non-existent order', async () => {
+      const fakeId = '00000000-0000-0000-0000-000000000000';
+
+      await request(app)
+        .patch(`/api/orders/${fakeId}/planogram`)
+        .send({ planogramReviewed: true })
+        .expect(404);
+    });
+  });
+
   describe('DELETE /api/orders/:id', () => {
     it('should delete an order', async () => {
       const order = await testPrisma.order.create({

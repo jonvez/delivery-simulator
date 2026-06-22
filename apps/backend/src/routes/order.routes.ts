@@ -4,6 +4,7 @@ import {
   createOrderSchema,
   updateOrderSchema,
   orderQuerySchema,
+  reviewPlanogramSchema,
 } from '../schemas/order.schema';
 import { ZodError } from 'zod';
 import { Prisma } from '@prisma/client';
@@ -104,6 +105,34 @@ router.patch('/:id/assign', async (req: Request, res: Response, next: NextFuncti
         res.status(404).json({
           error: 'Order not found',
         });
+        return;
+      }
+    }
+    next(error);
+  }
+});
+
+// PATCH /api/orders/:id/planogram - Record a planogram-compliance review (Issue #4)
+// IMPORTANT: This route must come BEFORE /:id routes to avoid path matching issues
+router.patch('/:id/planogram', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const validatedData = reviewPlanogramSchema.parse(req.body);
+
+    const order = await orderService.reviewPlanogram(id, validatedData);
+
+    res.json(order);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      res.status(400).json({
+        error: 'Validation failed',
+        details: error.errors,
+      });
+      return;
+    }
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2025') {
+        res.status(404).json({ error: 'Order not found' });
         return;
       }
     }

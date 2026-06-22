@@ -25,6 +25,24 @@ export const updateOrderSchema = z.object({
 
 export type UpdateOrderInput = z.infer<typeof updateOrderSchema>;
 
+// Planogram-compliance review schema - for PATCH /api/orders/:id/planogram (Issue #4)
+// `planogramReviewed` is REQUIRED. We accept a real boolean or the string forms
+// "true"/"false" (form/query sources) but do NOT use `z.coerce.boolean()`, which
+// would silently turn a missing field into `false` instead of failing validation.
+// Notes are length-bounded to avoid unbounded storage / log volume.
+const coercedBoolean = z.union([
+  z.boolean(),
+  z.literal('true').transform(() => true),
+  z.literal('false').transform(() => false),
+]);
+
+export const reviewPlanogramSchema = z.object({
+  planogramReviewed: coercedBoolean,
+  planogramNotes: z.string().max(1000, 'Notes must be 1000 characters or fewer').nullable().optional(),
+});
+
+export type ReviewPlanogramInput = z.infer<typeof reviewPlanogramSchema>;
+
 // Query params schema - for GET /api/orders
 export const orderQuerySchema = z.object({
   status: orderStatusSchema.optional(),

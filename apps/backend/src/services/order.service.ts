@@ -134,6 +134,32 @@ export class OrderService {
   }
 
   /**
+   * Record a planogram-compliance review for a stop.
+   * Issue #4: a rep marks "planogram reviewed" and optionally records notes.
+   *
+   * `planogramNotes` is only written when present in the payload, so a caller can
+   * toggle the reviewed flag without clobbering existing notes. Passing `null`
+   * explicitly clears the notes.
+   */
+  async reviewPlanogram(
+    id: string,
+    data: { planogramReviewed: boolean; planogramNotes?: string | null }
+  ): Promise<Order> {
+    const updateData: Prisma.OrderUpdateInput = {
+      planogramReviewed: data.planogramReviewed,
+    };
+
+    if (data.planogramNotes !== undefined) {
+      updateData.planogramNotes = data.planogramNotes;
+    }
+
+    return prisma.order.update({
+      where: { id },
+      data: updateData,
+    });
+  }
+
+  /**
    * Delete an order
    */
   async deleteOrder(id: string): Promise<Order> {
