@@ -80,12 +80,12 @@ describe('OrderList', () => {
     vi.spyOn(useOrdersModule, 'useOrders').mockReturnValue({
       orders: [],
       loading: false,
-      error: 'Failed to fetch orders',
+      error: 'Failed to fetch stops',
       refetch: mockRefetch,
     });
 
     render(<OrderList />);
-    expect(screen.getByText('Failed to fetch orders')).toBeInTheDocument();
+    expect(screen.getByText('Failed to fetch stops')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
   });
 
@@ -93,7 +93,7 @@ describe('OrderList', () => {
     vi.spyOn(useOrdersModule, 'useOrders').mockReturnValue({
       orders: [],
       loading: false,
-      error: 'Failed to fetch orders',
+      error: 'Failed to fetch stops',
       refetch: mockRefetch,
     });
 

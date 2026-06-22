@@ -30,7 +30,7 @@ export function useCreateDriver(): UseCreateDriverResult {
       return driver;
     } catch (err) {
       if (err instanceof ApiError) {
-        setError(err.message || 'Failed to create driver');
+        setError(err.message || 'Failed to create rep');
       } else {
         setError('An unexpected error occurred');
       }

@@ -371,13 +371,13 @@ describe('DriverForm', () => {
       vi.spyOn(useCreateDriverModule, 'useCreateDriver').mockReturnValue({
         createDriver: mockCreateDriver,
         loading: false,
-        error: 'Failed to create driver',
+        error: 'Failed to create rep',
         success: false,
         resetState: mockResetState,
       });
 
       render(<DriverForm />);
-      expect(screen.getByText('Failed to create driver')).toBeInTheDocument();
+      expect(screen.getByText('Failed to create rep')).toBeInTheDocument();
     });
   });
 });

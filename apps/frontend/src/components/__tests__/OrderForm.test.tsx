@@ -182,14 +182,14 @@ describe('OrderForm', () => {
     vi.spyOn(useCreateOrderModule, 'useCreateOrder').mockReturnValue({
       createOrder: mockCreateOrder,
       loading: false,
-      error: 'Failed to create order',
+      error: 'Failed to create stop',
       success: false,
       resetState: mockResetState,
     });
 
     render(<OrderForm />);
 
-    expect(screen.getByText('Failed to create order')).toBeInTheDocument();
+    expect(screen.getByText('Failed to create stop')).toBeInTheDocument();
   });
 
   it('should disable submit button while loading', () => {

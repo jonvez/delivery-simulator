@@ -25,7 +25,7 @@ export function useAssignOrder(): UseAssignOrderResult {
       return order;
     } catch (err) {
       if (err instanceof ApiError) {
-        setError(err.message || 'Failed to assign order');
+        setError(err.message || 'Failed to assign stop');
       } else {
         setError('An unexpected error occurred');
       }

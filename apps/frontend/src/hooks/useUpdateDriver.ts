@@ -30,7 +30,7 @@ export function useUpdateDriver(): UseUpdateDriverResult {
       return driver;
     } catch (err) {
       if (err instanceof ApiError) {
-        setError(err.message || 'Failed to update driver');
+        setError(err.message || 'Failed to update rep');
       } else {
         setError('An unexpected error occurred');
       }
