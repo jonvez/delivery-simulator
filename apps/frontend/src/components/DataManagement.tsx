@@ -83,7 +83,7 @@ export function DataManagement() {
               Data reset successful!
             </p>
             <p className="text-green-700 text-sm mt-1">
-              Created {resetResult.driversCreated} drivers and {resetResult.ordersCreated} orders.
+              Created {resetResult.driversCreated} reps and {resetResult.ordersCreated} stops.
               Refreshing dashboard...
             </p>
           </div>
@@ -111,7 +111,7 @@ export function DataManagement() {
             <AlertDialogHeader>
               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                This action will delete all existing orders and drivers, then
+                This action will delete all existing stops and reps, then
                 generate new seed data. This cannot be undone.
               </AlertDialogDescription>
             </AlertDialogHeader>
@@ -130,10 +130,10 @@ export function DataManagement() {
         <div className="text-sm text-muted-foreground">
           <p>This will:</p>
           <ul className="list-disc list-inside mt-2 space-y-1">
-            <li>Delete all existing orders and drivers</li>
-            <li>Generate 5-8 new drivers with random availability</li>
-            <li>Create 15-25 new orders with varied statuses</li>
-            <li>Assign orders to drivers realistically</li>
+            <li>Delete all existing stops and reps</li>
+            <li>Generate 5-8 new reps with random availability</li>
+            <li>Create 15-25 new stops with varied statuses</li>
+            <li>Assign stops to reps realistically</li>
             <li>Use pre-seeded Brooklyn addresses for geocoding</li>
           </ul>
         </div>

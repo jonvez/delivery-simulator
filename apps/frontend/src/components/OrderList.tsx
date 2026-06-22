@@ -17,23 +17,23 @@ import { Button } from '@/components/ui/button';
 const statusSections = [
   {
     status: OrderStatus.PENDING,
-    title: 'Pending Orders',
-    description: 'Orders waiting to be assigned to a driver',
+    title: 'Scheduled Stops',
+    description: 'Stops waiting to be assigned to a rep',
   },
   {
     status: OrderStatus.ASSIGNED,
-    title: 'Assigned Orders',
-    description: 'Orders assigned to a driver but not yet in transit',
+    title: 'Assigned Stops',
+    description: 'Stops assigned to a rep but not yet en route',
   },
   {
     status: OrderStatus.IN_TRANSIT,
-    title: 'In Transit',
-    description: 'Orders currently being delivered',
+    title: 'En Route',
+    description: 'Stops currently being delivered',
   },
   {
     status: OrderStatus.DELIVERED,
     title: 'Delivered',
-    description: 'Recently completed deliveries',
+    description: 'Recently completed stops',
   },
 ];
 
@@ -71,7 +71,7 @@ export function OrderList() {
       <Card>
         <CardContent className="pt-6">
           <div className="flex items-center justify-center py-8">
-            <div className="text-muted-foreground">Loading orders...</div>
+            <div className="text-muted-foreground">Loading stops...</div>
           </div>
         </CardContent>
       </Card>
@@ -99,8 +99,8 @@ export function OrderList() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Orders</CardTitle>
-          <CardDescription>No orders yet. Create your first order above.</CardDescription>
+          <CardTitle>Stops</CardTitle>
+          <CardDescription>No stops yet. Create your first stop above.</CardDescription>
         </CardHeader>
         <CardContent>
           <Button onClick={refetch} variant="outline" size="sm">
@@ -115,9 +115,9 @@ export function OrderList() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Orders</h2>
+          <h2 className="text-2xl font-bold">Stops</h2>
           <p className="text-muted-foreground">
-            Total: {orders.length} order{orders.length !== 1 ? 's' : ''}
+            Total: {orders.length} stop{orders.length !== 1 ? 's' : ''}
           </p>
         </div>
         <Button onClick={refetch} variant="outline" size="sm">
@@ -138,7 +138,7 @@ export function OrderList() {
               <h3 className="text-lg font-semibold">{title}</h3>
               <p className="text-sm text-muted-foreground">{description}</p>
               <p className="text-sm font-medium mt-1">
-                {statusOrders.length} order{statusOrders.length !== 1 ? 's' : ''}
+                {statusOrders.length} stop{statusOrders.length !== 1 ? 's' : ''}
               </p>
             </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

@@ -19,7 +19,7 @@ test.describe('Delivery Workflow', () => {
     await page.goto('/');
 
     // Click on "Create Order" or similar button
-    const createOrderButton = page.getByRole('button', { name: /create.*order|new.*order|add.*order/i });
+    const createOrderButton = page.getByRole('button', { name: /create.*stop|new.*stop|add.*stop/i });
 
     // Only click if the button exists (some views might have forms always visible)
     if (await createOrderButton.isVisible().catch(() => false)) {
@@ -27,12 +27,12 @@ test.describe('Delivery Workflow', () => {
     }
 
     // Fill in order form
-    await page.getByLabel(/customer.*name|name/i).fill('E2E Test Customer');
+    await page.getByLabel(/store.*account|name/i).fill('E2E Test Customer');
     await page.getByLabel(/phone|customer.*phone/i).fill('+15551234567');
-    await page.getByLabel(/address|delivery.*address/i).fill('123 Test St, Brooklyn, NY 11201');
+    await page.getByLabel(/store.*address|address/i).fill('123 Test St, Brooklyn, NY 11201');
 
-    // Fill order details if field exists
-    const orderDetailsField = page.getByLabel(/order.*details|details|items/i);
+    // Fill case list if field exists
+    const orderDetailsField = page.getByLabel(/case.*list|details|items/i);
     if (await orderDetailsField.isVisible().catch(() => false)) {
       await orderDetailsField.fill('Test pizza delivery');
     }
@@ -45,21 +45,21 @@ test.describe('Delivery Workflow', () => {
 
     // Verify order appears in pending orders
     await expect(page.getByText('E2E Test Customer')).toBeVisible();
-    await expect(page.getByText(/pending/i)).toBeVisible();
+    await expect(page.getByText(/scheduled/i)).toBeVisible();
   });
 
   test('should assign order to driver and verify status changes', async ({ page }) => {
     // First create an order
     await page.goto('/');
 
-    const createOrderButton = page.getByRole('button', { name: /create.*order|new.*order|add.*order/i });
+    const createOrderButton = page.getByRole('button', { name: /create.*stop|new.*stop|add.*stop/i });
     if (await createOrderButton.isVisible().catch(() => false)) {
       await createOrderButton.click();
     }
 
-    await page.getByLabel(/customer.*name|name/i).fill('Assignment Test');
+    await page.getByLabel(/store.*account|name/i).fill('Assignment Test');
     await page.getByLabel(/phone|customer.*phone/i).fill('+15559876543');
-    await page.getByLabel(/address|delivery.*address/i).fill('456 Brooklyn Ave, Brooklyn, NY 11215');
+    await page.getByLabel(/store.*address|address/i).fill('456 Brooklyn Ave, Brooklyn, NY 11215');
     await page.getByRole('button', { name: /submit|create|save/i }).click();
     await page.waitForTimeout(1000);
 
@@ -95,14 +95,14 @@ test.describe('Delivery Workflow', () => {
     // Create and assign an order first
     await page.goto('/');
 
-    const createOrderButton = page.getByRole('button', { name: /create.*order|new.*order|add.*order/i });
+    const createOrderButton = page.getByRole('button', { name: /create.*stop|new.*stop|add.*stop/i });
     if (await createOrderButton.isVisible().catch(() => false)) {
       await createOrderButton.click();
     }
 
-    await page.getByLabel(/customer.*name|name/i).fill('Transit Test');
+    await page.getByLabel(/store.*account|name/i).fill('Transit Test');
     await page.getByLabel(/phone|customer.*phone/i).fill('+15554443333');
-    await page.getByLabel(/address|delivery.*address/i).fill('789 Park Ave, Brooklyn, NY 11238');
+    await page.getByLabel(/store.*address|address/i).fill('789 Park Ave, Brooklyn, NY 11238');
     await page.getByRole('button', { name: /submit|create|save/i }).click();
     await page.waitForTimeout(1000);
 
@@ -116,7 +116,7 @@ test.describe('Delivery Workflow', () => {
       await statusButton.click();
 
       // Select IN_TRANSIT status
-      const inTransitOption = page.getByRole('option', { name: /in.*transit|transit/i });
+      const inTransitOption = page.getByRole('option', { name: /en.*route|route/i });
       if (await inTransitOption.isVisible().catch(() => false)) {
         await inTransitOption.click();
       }
@@ -125,7 +125,7 @@ test.describe('Delivery Workflow', () => {
     await page.waitForTimeout(1000);
 
     // Verify status is IN_TRANSIT
-    await expect(page.getByText(/in.*transit|transit/i)).toBeVisible();
+    await expect(page.getByText(/en.*route|route/i)).toBeVisible();
 
     // Verify timestamp is shown (looking for time format like "2:30 PM" or "14:30")
     const timeRegex = /\d{1,2}:\d{2}|\d{4}-\d{2}-\d{2}/;
@@ -136,14 +136,14 @@ test.describe('Delivery Workflow', () => {
     // Create an order
     await page.goto('/');
 
-    const createOrderButton = page.getByRole('button', { name: /create.*order|new.*order|add.*order/i });
+    const createOrderButton = page.getByRole('button', { name: /create.*stop|new.*stop|add.*stop/i });
     if (await createOrderButton.isVisible().catch(() => false)) {
       await createOrderButton.click();
     }
 
-    await page.getByLabel(/customer.*name|name/i).fill('Delivery Test');
+    await page.getByLabel(/store.*account|name/i).fill('Delivery Test');
     await page.getByLabel(/phone|customer.*phone/i).fill('+15552221111');
-    await page.getByLabel(/address|delivery.*address/i).fill('321 Heights St, Brooklyn, NY 11201');
+    await page.getByLabel(/store.*address|address/i).fill('321 Heights St, Brooklyn, NY 11201');
     await page.getByRole('button', { name: /submit|create|save/i }).click();
     await page.waitForTimeout(1000);
 

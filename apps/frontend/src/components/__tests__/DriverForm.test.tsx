@@ -28,10 +28,10 @@ describe('DriverForm', () => {
     it('should render all form fields', () => {
       render(<DriverForm />);
 
-      expect(screen.getByText('Add New Driver')).toBeInTheDocument();
-      expect(screen.getByLabelText(/driver name/i)).toBeInTheDocument();
+      expect(screen.getByText('Add New Rep')).toBeInTheDocument();
+      expect(screen.getByLabelText(/rep name/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/available for assignments/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /create driver/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /create rep/i })).toBeInTheDocument();
     });
 
     it('should have availability checkbox checked by default', () => {
@@ -43,7 +43,7 @@ describe('DriverForm', () => {
     it('should render input fields as enabled by default', () => {
       render(<DriverForm />);
 
-      const nameInput = screen.getByLabelText(/driver name/i);
+      const nameInput = screen.getByLabelText(/rep name/i);
       expect(nameInput).not.toBeDisabled();
     });
   });
@@ -51,7 +51,7 @@ describe('DriverForm', () => {
   describe('Form Input Handling', () => {
     it('should update name field when typing', () => {
       render(<DriverForm />);
-      const nameInput = screen.getByLabelText(/driver name/i);
+      const nameInput = screen.getByLabelText(/rep name/i);
 
       fireEvent.change(nameInput, { target: { value: 'John Doe' } });
       expect(nameInput).toHaveValue('John Doe');
@@ -75,11 +75,11 @@ describe('DriverForm', () => {
     it('should display validation error for empty name field', async () => {
       render(<DriverForm />);
 
-      const submitButton = screen.getByRole('button', { name: /create driver/i });
+      const submitButton = screen.getByRole('button', { name: /create rep/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByText('Driver name is required')).toBeInTheDocument();
+        expect(screen.getByText('Rep name is required')).toBeInTheDocument();
       });
 
       expect(mockCreateDriver).not.toHaveBeenCalled();
@@ -87,16 +87,16 @@ describe('DriverForm', () => {
 
     it('should display validation error for name exceeding maximum length', async () => {
       render(<DriverForm />);
-      const nameInput = screen.getByLabelText(/driver name/i);
+      const nameInput = screen.getByLabelText(/rep name/i);
 
       const longName = 'a'.repeat(256);
       fireEvent.change(nameInput, { target: { value: longName } });
 
-      const submitButton = screen.getByRole('button', { name: /create driver/i });
+      const submitButton = screen.getByRole('button', { name: /create rep/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByText('Driver name must be less than 255 characters')).toBeInTheDocument();
+        expect(screen.getByText('Rep name must be less than 255 characters')).toBeInTheDocument();
       });
 
       expect(mockCreateDriver).not.toHaveBeenCalled();
@@ -104,34 +104,34 @@ describe('DriverForm', () => {
 
     it('should clear validation error when user starts typing', async () => {
       render(<DriverForm />);
-      const nameInput = screen.getByLabelText(/driver name/i);
-      const submitButton = screen.getByRole('button', { name: /create driver/i });
+      const nameInput = screen.getByLabelText(/rep name/i);
+      const submitButton = screen.getByRole('button', { name: /create rep/i });
 
       // Trigger validation error
       fireEvent.click(submitButton);
       await waitFor(() => {
-        expect(screen.getByText('Driver name is required')).toBeInTheDocument();
+        expect(screen.getByText('Rep name is required')).toBeInTheDocument();
       });
 
       // Start typing
       fireEvent.change(nameInput, { target: { value: 'J' } });
 
       await waitFor(() => {
-        expect(screen.queryByText('Driver name is required')).not.toBeInTheDocument();
+        expect(screen.queryByText('Rep name is required')).not.toBeInTheDocument();
       });
     });
 
     it('should trim whitespace from name before validation', async () => {
       render(<DriverForm />);
-      const nameInput = screen.getByLabelText(/driver name/i);
+      const nameInput = screen.getByLabelText(/rep name/i);
 
       fireEvent.change(nameInput, { target: { value: '   ' } });
 
-      const submitButton = screen.getByRole('button', { name: /create driver/i });
+      const submitButton = screen.getByRole('button', { name: /create rep/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByText('Driver name is required')).toBeInTheDocument();
+        expect(screen.getByText('Rep name is required')).toBeInTheDocument();
       });
 
       expect(mockCreateDriver).not.toHaveBeenCalled();
@@ -152,10 +152,10 @@ describe('DriverForm', () => {
 
       render(<DriverForm />);
 
-      const nameInput = screen.getByLabelText(/driver name/i);
+      const nameInput = screen.getByLabelText(/rep name/i);
       fireEvent.change(nameInput, { target: { value: 'John Doe' } });
 
-      const submitButton = screen.getByRole('button', { name: /create driver/i });
+      const submitButton = screen.getByRole('button', { name: /create rep/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -179,10 +179,10 @@ describe('DriverForm', () => {
 
       render(<DriverForm />);
 
-      const nameInput = screen.getByLabelText(/driver name/i);
+      const nameInput = screen.getByLabelText(/rep name/i);
       fireEvent.change(nameInput, { target: { value: '  John Doe  ' } });
 
-      const submitButton = screen.getByRole('button', { name: /create driver/i });
+      const submitButton = screen.getByRole('button', { name: /create rep/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -206,13 +206,13 @@ describe('DriverForm', () => {
 
       render(<DriverForm />);
 
-      const nameInput = screen.getByLabelText(/driver name/i);
+      const nameInput = screen.getByLabelText(/rep name/i);
       fireEvent.change(nameInput, { target: { value: 'John Doe' } });
 
       const checkbox = screen.getByRole('checkbox', { name: /available for assignments/i });
       fireEvent.click(checkbox);
 
-      const submitButton = screen.getByRole('button', { name: /create driver/i });
+      const submitButton = screen.getByRole('button', { name: /create rep/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -236,13 +236,13 @@ describe('DriverForm', () => {
 
       render(<DriverForm />);
 
-      const nameInput = screen.getByLabelText(/driver name/i);
+      const nameInput = screen.getByLabelText(/rep name/i);
       fireEvent.change(nameInput, { target: { value: 'John Doe' } });
 
       const checkbox = screen.getByRole('checkbox', { name: /available for assignments/i });
       fireEvent.click(checkbox);
 
-      const submitButton = screen.getByRole('button', { name: /create driver/i });
+      const submitButton = screen.getByRole('button', { name: /create rep/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -264,10 +264,10 @@ describe('DriverForm', () => {
 
       render(<DriverForm onDriverCreated={mockOnDriverCreated} />);
 
-      const nameInput = screen.getByLabelText(/driver name/i);
+      const nameInput = screen.getByLabelText(/rep name/i);
       fireEvent.change(nameInput, { target: { value: 'John Doe' } });
 
-      const submitButton = screen.getByRole('button', { name: /create driver/i });
+      const submitButton = screen.getByRole('button', { name: /create rep/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -280,10 +280,10 @@ describe('DriverForm', () => {
 
       render(<DriverForm />);
 
-      const nameInput = screen.getByLabelText(/driver name/i);
+      const nameInput = screen.getByLabelText(/rep name/i);
       fireEvent.change(nameInput, { target: { value: 'John Doe' } });
 
-      const submitButton = screen.getByRole('button', { name: /create driver/i });
+      const submitButton = screen.getByRole('button', { name: /create rep/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -306,10 +306,10 @@ describe('DriverForm', () => {
 
       render(<DriverForm />);
 
-      const nameInput = screen.getByLabelText(/driver name/i);
+      const nameInput = screen.getByLabelText(/rep name/i);
       fireEvent.change(nameInput, { target: { value: 'John Doe' } });
 
-      const submitButton = screen.getByRole('button', { name: /create driver/i });
+      const submitButton = screen.getByRole('button', { name: /create rep/i });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -330,9 +330,9 @@ describe('DriverForm', () => {
 
       render(<DriverForm />);
 
-      const nameInput = screen.getByLabelText(/driver name/i);
+      const nameInput = screen.getByLabelText(/rep name/i);
       const checkbox = screen.getByRole('checkbox', { name: /available for assignments/i });
-      const submitButton = screen.getByRole('button', { name: /creating driver/i });
+      const submitButton = screen.getByRole('button', { name: /creating rep/i });
 
       expect(nameInput).toBeDisabled();
       expect(checkbox).toBeDisabled();
@@ -349,7 +349,7 @@ describe('DriverForm', () => {
       });
 
       render(<DriverForm />);
-      expect(screen.getByRole('button', { name: /creating driver/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /creating rep/i })).toBeInTheDocument();
     });
   });
 
@@ -364,20 +364,20 @@ describe('DriverForm', () => {
       });
 
       render(<DriverForm />);
-      expect(screen.getByText('Driver created successfully!')).toBeInTheDocument();
+      expect(screen.getByText('Rep created successfully!')).toBeInTheDocument();
     });
 
     it('should display error message when creation fails', () => {
       vi.spyOn(useCreateDriverModule, 'useCreateDriver').mockReturnValue({
         createDriver: mockCreateDriver,
         loading: false,
-        error: 'Failed to create driver',
+        error: 'Failed to create rep',
         success: false,
         resetState: mockResetState,
       });
 
       render(<DriverForm />);
-      expect(screen.getByText('Failed to create driver')).toBeInTheDocument();
+      expect(screen.getByText('Failed to create rep')).toBeInTheDocument();
     });
   });
 });

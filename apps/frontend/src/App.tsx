@@ -25,9 +25,9 @@ function App() {
         <div className="max-w-[1800px] mx-auto px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">Delivery Manager</h1>
+              <h1 className="text-3xl font-bold tracking-tight">DSD Route Manager</h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Restaurant delivery operations dashboard
+                Direct Store Delivery for convenience-store distribution
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -81,8 +81,8 @@ function App() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Orders</CardTitle>
-                <CardDescription>Create and manage delivery orders</CardDescription>
+                <CardTitle>Stops</CardTitle>
+                <CardDescription>Create and manage delivery stops</CardDescription>
               </CardHeader>
               <CardContent>
                 <OrderForm />
@@ -95,20 +95,20 @@ function App() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Drivers</CardTitle>
-                <CardDescription>Manage your delivery drivers</CardDescription>
+                <CardTitle>Reps</CardTitle>
+                <CardDescription>Manage your route reps</CardDescription>
               </CardHeader>
               <CardContent>
                 <DriverForm onDriverCreated={() => {
-                  // Driver list will auto-refresh via useDrivers hook
+                  // Rep list will auto-refresh via useDrivers hook
                 }} />
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle>Driver List</CardTitle>
-                <CardDescription>All registered drivers</CardDescription>
+                <CardTitle>Rep List</CardTitle>
+                <CardDescription>All registered reps</CardDescription>
               </CardHeader>
               <CardContent>
                 <DriverList />
@@ -122,7 +122,7 @@ function App() {
           <div>
             <h2 className="text-2xl font-bold tracking-tight">Route Visualization</h2>
             <p className="text-sm text-muted-foreground">
-              View driver delivery routes and sequences on interactive maps
+              View rep delivery routes and stop sequences on interactive maps
             </p>
           </div>
           <DriverMapView />
@@ -141,48 +141,20 @@ function App() {
 
         {/* Footer */}
         <footer className="border-t pt-8 mt-16">
-          <div className="text-center space-y-4">
-            <h3 className="text-sm font-semibold text-muted-foreground">
-              Completed Stories
+          <div className="max-w-3xl mx-auto text-center space-y-3">
+            <h3 className="text-sm font-semibold text-foreground">
+              About this demo
             </h3>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs text-muted-foreground">
-              <div className="space-y-1">
-                <p className="font-semibold text-foreground">Epic 1: Foundation</p>
-                <p>✅ 1.1: Monorepo</p>
-                <p>✅ 1.2: UI Framework</p>
-                <p>✅ 1.3: Database</p>
-                <p>✅ 1.4: API</p>
-                <p>✅ 1.5: Integration</p>
-              </div>
-              <div className="space-y-1">
-                <p className="font-semibold text-foreground">Epic 2: Orders</p>
-                <p>✅ 2.1: Schema & API</p>
-                <p>✅ 2.2: Order Form</p>
-                <p>✅ 2.3: Order List</p>
-              </div>
-              <div className="space-y-1">
-                <p className="font-semibold text-foreground">Epic 3: Drivers</p>
-                <p>✅ 3.1: Schema & API</p>
-                <p>✅ 3.2: Driver UI</p>
-                <p>✅ 3.3: Availability</p>
-                <p>✅ 3.4: Assignment</p>
-                <p>✅ 3.5-3.7: Management</p>
-              </div>
-              <div className="space-y-1">
-                <p className="font-semibold text-foreground">Epic 4: Maps & Dashboard</p>
-                <p>✅ 4.1: Leaflet Maps</p>
-                <p>✅ 4.2: Geocoding</p>
-                <p>✅ 4.3: Driver Maps</p>
-                <p>✅ 4.4: Route Viz</p>
-                <p>✅ 4.5: Dashboard</p>
-              </div>
-              <div className="space-y-1">
-                <p className="font-semibold text-foreground">Epic 5: Data & QA</p>
-                <p>✅ 5.1: Brooklyn Addresses</p>
-                <p>✅ 5.2: Seed Generation</p>
-                <p>✅ 5.3: Data Reset</p>
-              </div>
-            </div>
+            <p className="text-sm text-muted-foreground">
+              DSD Route Manager is a Direct Store Delivery operations demo for
+              convenience-store distribution: dispatchers schedule store stops, assign
+              route reps, and track each stop through Scheduled → Assigned → En Route →
+              Delivered, with live route maps and per-rep stop sequences.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Built solo with Claude Code — an AI-assisted build, reframed from a generic
+              delivery app into the DSD / convenience-store domain.
+            </p>
           </div>
         </footer>
       </div>

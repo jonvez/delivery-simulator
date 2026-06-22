@@ -73,19 +73,19 @@ describe('OrderList', () => {
     });
 
     render(<OrderList />);
-    expect(screen.getByText('Loading orders...')).toBeInTheDocument();
+    expect(screen.getByText('Loading stops...')).toBeInTheDocument();
   });
 
   it('should render error state', () => {
     vi.spyOn(useOrdersModule, 'useOrders').mockReturnValue({
       orders: [],
       loading: false,
-      error: 'Failed to fetch orders',
+      error: 'Failed to fetch stops',
       refetch: mockRefetch,
     });
 
     render(<OrderList />);
-    expect(screen.getByText('Failed to fetch orders')).toBeInTheDocument();
+    expect(screen.getByText('Failed to fetch stops')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
   });
 
@@ -93,7 +93,7 @@ describe('OrderList', () => {
     vi.spyOn(useOrdersModule, 'useOrders').mockReturnValue({
       orders: [],
       loading: false,
-      error: 'Failed to fetch orders',
+      error: 'Failed to fetch stops',
       refetch: mockRefetch,
     });
 
@@ -111,18 +111,18 @@ describe('OrderList', () => {
     });
 
     render(<OrderList />);
-    expect(screen.getByText(/No orders yet/i)).toBeInTheDocument();
+    expect(screen.getByText(/No stops yet/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /refresh/i })).toBeInTheDocument();
   });
 
-  it('should render order list with total count', () => {
+  it('should render stop list with total count', () => {
     render(<OrderList />);
 
-    expect(screen.getByText('Orders')).toBeInTheDocument();
-    expect(screen.getByText('Total: 3 orders')).toBeInTheDocument();
+    expect(screen.getByText('Stops')).toBeInTheDocument();
+    expect(screen.getByText('Total: 3 stops')).toBeInTheDocument();
   });
 
-  it('should display singular order text when only one order', () => {
+  it('should display singular stop text when only one stop', () => {
     vi.spyOn(useOrdersModule, 'useOrders').mockReturnValue({
       orders: [mockOrders[0]],
       loading: false,
@@ -131,36 +131,36 @@ describe('OrderList', () => {
     });
 
     render(<OrderList />);
-    expect(screen.getByText('Total: 1 order')).toBeInTheDocument();
+    expect(screen.getByText('Total: 1 stop')).toBeInTheDocument();
   });
 
-  it('should group orders by status', () => {
+  it('should group stops by status using DSD vocabulary', () => {
     render(<OrderList />);
 
-    expect(screen.getByText('Pending Orders')).toBeInTheDocument();
-    expect(screen.getByText('Assigned Orders')).toBeInTheDocument();
-    // "In Transit" appears in both the section heading and order badges,
+    expect(screen.getByText('Scheduled Stops')).toBeInTheDocument();
+    expect(screen.getByText('Assigned Stops')).toBeInTheDocument();
+    // "En Route" appears in both the section heading and stop badges,
     // so use getAllByText
-    const inTransitTexts = screen.getAllByText('In Transit');
-    expect(inTransitTexts.length).toBeGreaterThanOrEqual(1);
+    const enRouteTexts = screen.getAllByText('En Route');
+    expect(enRouteTexts.length).toBeGreaterThanOrEqual(1);
   });
 
   it('should not render empty status sections', () => {
     render(<OrderList />);
 
-    // DELIVERED section should not appear since no orders have that status
+    // DELIVERED section should not appear since no stops have that status
     expect(screen.queryByText('Delivered')).not.toBeInTheDocument();
   });
 
   it('should display correct count for each status section', () => {
     render(<OrderList />);
 
-    // Find all instances of "1 order" text
-    const oneOrderTexts = screen.getAllByText('1 order');
+    // Find all instances of "1 stop" text
+    const oneStopTexts = screen.getAllByText('1 stop');
 
-    // We should have 3 status sections, each with "1 order"
+    // We should have 3 status sections, each with "1 stop"
     // (PENDING, ASSIGNED, IN_TRANSIT)
-    expect(oneOrderTexts).toHaveLength(3);
+    expect(oneStopTexts).toHaveLength(3);
   });
 
   it('should display all order cards', () => {
@@ -198,7 +198,7 @@ describe('OrderList', () => {
 
     render(<OrderList />);
 
-    expect(screen.getByText('2 orders')).toBeInTheDocument();
+    expect(screen.getByText('2 stops')).toBeInTheDocument();
     expect(screen.getByText('John Doe')).toBeInTheDocument();
     expect(screen.getByText('Alice Brown')).toBeInTheDocument();
   });

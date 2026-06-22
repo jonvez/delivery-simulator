@@ -36,7 +36,7 @@ function DriverCard({ driver, isExpanded, onToggleExpansion, onToggleAvailabilit
             <h4 className="font-medium">{driver.name}</h4>
             {activeOrders.length > 0 && (
               <Badge variant="outline" className="text-xs">
-                {activeOrders.length} active order{activeOrders.length !== 1 ? 's' : ''}
+                {activeOrders.length} active stop{activeOrders.length !== 1 ? 's' : ''}
               </Badge>
             )}
           </div>
@@ -49,7 +49,7 @@ function DriverCard({ driver, isExpanded, onToggleExpansion, onToggleAvailabilit
             variant={driver.isAvailable ? 'default' : 'secondary'}
             className={driver.isAvailable ? 'bg-green-600' : ''}
           >
-            {driver.isAvailable ? 'Available' : 'Unavailable'}
+            {driver.isAvailable ? 'On Route' : 'Off Route'}
           </Badge>
           <Button
             onClick={() => onToggleAvailability(driver.id, driver.isAvailable)}
@@ -57,29 +57,29 @@ function DriverCard({ driver, isExpanded, onToggleExpansion, onToggleAvailabilit
             size="sm"
             disabled={updating}
           >
-            {driver.isAvailable ? 'Mark Unavailable' : 'Mark Available'}
+            {driver.isAvailable ? 'Mark Off Route' : 'Mark On Route'}
           </Button>
           <Button
             onClick={() => onToggleExpansion(driver.id)}
             variant="ghost"
             size="sm"
           >
-            {isExpanded ? 'Hide Orders' : 'View Orders'}
+            {isExpanded ? 'Hide Stops' : 'View Stops'}
           </Button>
         </div>
       </div>
 
-      {/* Expanded view showing driver's orders */}
+      {/* Expanded view showing rep's stops */}
       {isExpanded && (
         <div className="mt-4 pt-4 border-t space-y-4">
           {ordersLoading ? (
-            <div className="text-center text-gray-500 py-4">Loading orders...</div>
+            <div className="text-center text-gray-500 py-4">Loading stops...</div>
           ) : orders.length === 0 ? (
-            <div className="text-center text-gray-500 py-4">No orders assigned yet</div>
+            <div className="text-center text-gray-500 py-4">No stops assigned yet</div>
           ) : (
             <>
               <div>
-                <h5 className="font-semibold text-sm mb-2">All Orders ({orders.length})</h5>
+                <h5 className="font-semibold text-sm mb-2">All Stops ({orders.length})</h5>
                 <div className="grid gap-3 md:grid-cols-2">
                   {orders.map((order) => (
                     <OrderCard key={order.id} order={order} />
@@ -120,7 +120,7 @@ export function DriverList() {
   if (loading) {
     return (
       <div className="p-6 text-center text-gray-500">
-        Loading drivers...
+        Loading reps...
       </div>
     );
   }
@@ -141,7 +141,7 @@ export function DriverList() {
   if (drivers.length === 0) {
     return (
       <div className="p-6 text-center space-y-4">
-        <p className="text-gray-500">No drivers yet. Add your first driver above.</p>
+        <p className="text-gray-500">No reps yet. Add your first rep above.</p>
         <Button onClick={refetch} variant="outline">
           Refresh
         </Button>
@@ -153,9 +153,9 @@ export function DriverList() {
     <div className="space-y-4">
       <div className="flex items-center justify-between px-4">
         <h3 className="text-lg font-semibold">
-          Drivers
+          Reps
           <span className="ml-2 text-sm text-gray-500 font-normal">
-            ({drivers.length} {drivers.length === 1 ? 'driver' : 'drivers'})
+            ({drivers.length} {drivers.length === 1 ? 'rep' : 'reps'})
           </span>
         </h3>
         <Button onClick={refetch} variant="ghost" size="sm">

@@ -27,7 +27,7 @@ export function useDrivers(): UseDriversResult {
       setDrivers(data);
     } catch (err) {
       if (err instanceof ApiError) {
-        setError(err.message || 'Failed to fetch drivers');
+        setError(err.message || 'Failed to fetch reps');
       } else {
         setError('An unexpected error occurred');
       }

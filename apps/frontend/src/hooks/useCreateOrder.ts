@@ -26,7 +26,7 @@ export function useCreateOrder(): UseCreateOrderResult {
       return order;
     } catch (err) {
       if (err instanceof ApiError) {
-        setError(err.message || 'Failed to create order');
+        setError(err.message || 'Failed to create stop');
       } else {
         setError('An unexpected error occurred');
       }

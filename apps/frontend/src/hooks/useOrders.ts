@@ -40,7 +40,7 @@ export function useOrders(options: UseOrdersOptions = {}): UseOrdersResult {
       setOrders(data);
     } catch (err) {
       if (err instanceof ApiError) {
-        setError(err.message || 'Failed to fetch orders');
+        setError(err.message || 'Failed to fetch stops');
       } else {
         setError('An unexpected error occurred');
       }
