@@ -36,7 +36,7 @@ function DriverCard({ driver, isExpanded, onToggleExpansion, onToggleAvailabilit
             <h4 className="font-medium">{driver.name}</h4>
             {activeOrders.length > 0 && (
               <Badge variant="outline" className="text-xs">
-                {activeOrders.length} active order{activeOrders.length !== 1 ? 's' : ''}
+                {activeOrders.length} active stop{activeOrders.length !== 1 ? 's' : ''}
               </Badge>
             )}
           </div>
@@ -64,22 +64,22 @@ function DriverCard({ driver, isExpanded, onToggleExpansion, onToggleAvailabilit
             variant="ghost"
             size="sm"
           >
-            {isExpanded ? 'Hide Orders' : 'View Orders'}
+            {isExpanded ? 'Hide Stops' : 'View Stops'}
           </Button>
         </div>
       </div>
 
-      {/* Expanded view showing driver's orders */}
+      {/* Expanded view showing rep's stops */}
       {isExpanded && (
         <div className="mt-4 pt-4 border-t space-y-4">
           {ordersLoading ? (
-            <div className="text-center text-gray-500 py-4">Loading orders...</div>
+            <div className="text-center text-gray-500 py-4">Loading stops...</div>
           ) : orders.length === 0 ? (
             <div className="text-center text-gray-500 py-4">No stops assigned yet</div>
           ) : (
             <>
               <div>
-                <h5 className="font-semibold text-sm mb-2">All Orders ({orders.length})</h5>
+                <h5 className="font-semibold text-sm mb-2">All Stops ({orders.length})</h5>
                 <div className="grid gap-3 md:grid-cols-2">
                   {orders.map((order) => (
                     <OrderCard key={order.id} order={order} />

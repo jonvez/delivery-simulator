@@ -33,7 +33,7 @@ export function useDriverOrders(driverId: string | null): UseDriverOrdersResult 
       setOrders(data);
     } catch (err) {
       if (err instanceof ApiError) {
-        setError(err.message || 'Failed to fetch driver orders');
+        setError(err.message || 'Failed to fetch rep stops');
       } else {
         setError('An unexpected error occurred');
       }

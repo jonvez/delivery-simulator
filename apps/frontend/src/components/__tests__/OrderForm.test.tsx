@@ -28,23 +28,23 @@ describe('OrderForm', () => {
   it('should render all form fields', () => {
     render(<OrderForm />);
 
-    expect(screen.getByLabelText(/customer name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/store account/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/customer phone/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/delivery address/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/order details/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /create order/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/store address/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/case list/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /create stop/i })).toBeInTheDocument();
   });
 
   it('should display validation errors for empty required fields', async () => {
     render(<OrderForm />);
 
-    const submitButton = screen.getByRole('button', { name: /create order/i });
+    const submitButton = screen.getByRole('button', { name: /create stop/i });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText('Customer name is required')).toBeInTheDocument();
+      expect(screen.getByText('Store account is required')).toBeInTheDocument();
       expect(screen.getByText('Customer phone is required')).toBeInTheDocument();
-      expect(screen.getByText('Delivery address is required')).toBeInTheDocument();
+      expect(screen.getByText('Store address is required')).toBeInTheDocument();
     });
 
     // Should not call createOrder when validation fails
@@ -57,12 +57,12 @@ describe('OrderForm', () => {
 
     // Customer name > 255 chars
     const longName = 'a'.repeat(256);
-    await user.type(screen.getByLabelText(/customer name/i), longName);
-    fireEvent.click(screen.getByRole('button', { name: /create order/i }));
+    await user.type(screen.getByLabelText(/store account/i), longName);
+    fireEvent.click(screen.getByRole('button', { name: /create stop/i }));
 
     await waitFor(() => {
       expect(
-        screen.getByText('Customer name must be less than 255 characters')
+        screen.getByText('Store account must be less than 255 characters')
       ).toBeInTheDocument();
     });
 
@@ -90,13 +90,13 @@ describe('OrderForm', () => {
     const user = userEvent.setup();
 
     // Fill in the form
-    await user.type(screen.getByLabelText(/customer name/i), 'John Doe');
+    await user.type(screen.getByLabelText(/store account/i), 'John Doe');
     await user.type(screen.getByLabelText(/customer phone/i), '+1234567890');
-    await user.type(screen.getByLabelText(/delivery address/i), '123 Main St');
-    await user.type(screen.getByLabelText(/order details/i), 'Leave at door');
+    await user.type(screen.getByLabelText(/store address/i), '123 Main St');
+    await user.type(screen.getByLabelText(/case list/i), 'Leave at door');
 
     // Submit the form
-    fireEvent.click(screen.getByRole('button', { name: /create order/i }));
+    fireEvent.click(screen.getByRole('button', { name: /create stop/i }));
 
     await waitFor(() => {
       expect(mockResetState).toHaveBeenCalled();
@@ -130,12 +130,12 @@ describe('OrderForm', () => {
     const user = userEvent.setup();
 
     // Fill in only required fields
-    await user.type(screen.getByLabelText(/customer name/i), 'Jane Doe');
+    await user.type(screen.getByLabelText(/store account/i), 'Jane Doe');
     await user.type(screen.getByLabelText(/customer phone/i), '+9876543210');
-    await user.type(screen.getByLabelText(/delivery address/i), '456 Oak Ave');
+    await user.type(screen.getByLabelText(/store address/i), '456 Oak Ave');
 
     // Submit the form
-    fireEvent.click(screen.getByRole('button', { name: /create order/i }));
+    fireEvent.click(screen.getByRole('button', { name: /create stop/i }));
 
     await waitFor(() => {
       expect(mockCreateOrder).toHaveBeenCalledWith({
@@ -175,7 +175,7 @@ describe('OrderForm', () => {
 
     render(<OrderForm />);
 
-    expect(screen.getByText('Order created successfully!')).toBeInTheDocument();
+    expect(screen.getByText('Stop created successfully!')).toBeInTheDocument();
   });
 
   it('should display error message on failed submission', () => {
@@ -203,7 +203,7 @@ describe('OrderForm', () => {
 
     render(<OrderForm />);
 
-    const submitButton = screen.getByRole('button', { name: /creating order/i });
+    const submitButton = screen.getByRole('button', { name: /creating stop/i });
     expect(submitButton).toBeDisabled();
   });
 
@@ -228,16 +228,16 @@ describe('OrderForm', () => {
     const user = userEvent.setup();
 
     // Fill in the form
-    const nameInput = screen.getByLabelText(/customer name/i) as HTMLInputElement;
+    const nameInput = screen.getByLabelText(/store account/i) as HTMLInputElement;
     const phoneInput = screen.getByLabelText(/customer phone/i) as HTMLInputElement;
-    const addressInput = screen.getByLabelText(/delivery address/i) as HTMLTextAreaElement;
+    const addressInput = screen.getByLabelText(/store address/i) as HTMLTextAreaElement;
 
     await user.type(nameInput, 'John Doe');
     await user.type(phoneInput, '+1234567890');
     await user.type(addressInput, '123 Main St');
 
     // Submit the form
-    fireEvent.click(screen.getByRole('button', { name: /create order/i }));
+    fireEvent.click(screen.getByRole('button', { name: /create stop/i }));
 
     await waitFor(() => {
       // Form fields should be reset
@@ -252,18 +252,18 @@ describe('OrderForm', () => {
     const user = userEvent.setup();
 
     // Trigger validation by submitting empty form
-    fireEvent.click(screen.getByRole('button', { name: /create order/i }));
+    fireEvent.click(screen.getByRole('button', { name: /create stop/i }));
 
     await waitFor(() => {
-      expect(screen.getByText('Customer name is required')).toBeInTheDocument();
+      expect(screen.getByText('Store account is required')).toBeInTheDocument();
     });
 
     // Start typing in customer name field
-    await user.type(screen.getByLabelText(/customer name/i), 'J');
+    await user.type(screen.getByLabelText(/store account/i), 'J');
 
     // Error should be cleared
     await waitFor(() => {
-      expect(screen.queryByText('Customer name is required')).not.toBeInTheDocument();
+      expect(screen.queryByText('Store account is required')).not.toBeInTheDocument();
     });
   });
 });

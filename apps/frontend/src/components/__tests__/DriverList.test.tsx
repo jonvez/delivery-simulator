@@ -243,28 +243,21 @@ describe('DriverList', () => {
     });
   });
 
-  describe('Driver Orders Expansion', () => {
-    it('should show "View Orders" button by default', () => {
+  describe('Rep Stops Expansion', () => {
+    it('should show "View Stops" button by default', () => {
       render(<DriverList />);
-      const viewButtons = screen.getAllByRole('button', { name: /view orders/i });
+      const viewButtons = screen.getAllByRole('button', { name: /view stops/i });
       expect(viewButtons.length).toBeGreaterThan(0);
     });
 
-    it('should expand driver orders when "View Orders" is clicked', () => {
-      vi.spyOn(useDriverOrdersModule, 'useDriverOrders').mockReturnValue({
-        orders: mockOrders,
-        loading: false,
-        error: null,
-      });
-
+    // Regression (#10): the "View/Hide Orders" button must use Stops vocabulary
+    it('should not render any "Orders" button label (DSD regression)', () => {
       render(<DriverList />);
-      const viewButton = screen.getAllByRole('button', { name: /view orders/i })[0];
-      fireEvent.click(viewButton);
-
-      expect(screen.getByText(/hide orders/i)).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /view orders/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /hide orders/i })).not.toBeInTheDocument();
     });
 
-    it('should show active order count badge', () => {
+    it('should expand rep stops when "View Stops" is clicked', () => {
       vi.spyOn(useDriverOrdersModule, 'useDriverOrders').mockReturnValue({
         orders: mockOrders,
         loading: false,
@@ -272,15 +265,46 @@ describe('DriverList', () => {
       });
 
       render(<DriverList />);
-      const viewButton = screen.getAllByRole('button', { name: /view orders/i })[0];
+      const viewButton = screen.getAllByRole('button', { name: /view stops/i })[0];
       fireEvent.click(viewButton);
 
-      // Use getAllByText since badge appears multiple times (for each driver with orders)
-      const badges = screen.getAllByText('2 active orders');
+      expect(screen.getByText(/hide stops/i)).toBeInTheDocument();
+    });
+
+    it('should show active stop count badge', () => {
+      vi.spyOn(useDriverOrdersModule, 'useDriverOrders').mockReturnValue({
+        orders: mockOrders,
+        loading: false,
+        error: null,
+      });
+
+      render(<DriverList />);
+      const viewButton = screen.getAllByRole('button', { name: /view stops/i })[0];
+      fireEvent.click(viewButton);
+
+      // Use getAllByText since badge appears multiple times (for each rep with stops)
+      const badges = screen.getAllByText('2 active stops');
       expect(badges.length).toBeGreaterThan(0);
     });
 
-    it('should show loading state when fetching driver orders', () => {
+    // Regression (#10): expanded "All Orders (n)" header must use Stops vocabulary
+    it('should render "All Stops (n)" header when expanded (DSD regression)', () => {
+      vi.spyOn(useDriverOrdersModule, 'useDriverOrders').mockReturnValue({
+        orders: mockOrders,
+        loading: false,
+        error: null,
+      });
+
+      render(<DriverList />);
+      const viewButton = screen.getAllByRole('button', { name: /view stops/i })[0];
+      fireEvent.click(viewButton);
+
+      expect(screen.getByText('All Stops (2)')).toBeInTheDocument();
+      expect(screen.queryByText(/All Orders/)).not.toBeInTheDocument();
+    });
+
+    // Regression (#10): the expansion loading state must use Stops vocabulary
+    it('should show loading state with Stops vocabulary when fetching rep stops (DSD regression)', () => {
       vi.spyOn(useDriverOrdersModule, 'useDriverOrders').mockReturnValue({
         orders: [],
         loading: true,
@@ -288,13 +312,14 @@ describe('DriverList', () => {
       });
 
       render(<DriverList />);
-      const viewButton = screen.getAllByRole('button', { name: /view orders/i })[0];
+      const viewButton = screen.getAllByRole('button', { name: /view stops/i })[0];
       fireEvent.click(viewButton);
 
-      expect(screen.getByText('Loading orders...')).toBeInTheDocument();
+      expect(screen.getByText('Loading stops...')).toBeInTheDocument();
+      expect(screen.queryByText('Loading orders...')).not.toBeInTheDocument();
     });
 
-    it('should show empty state when driver has no orders', () => {
+    it('should show empty state when rep has no stops', () => {
       vi.spyOn(useDriverOrdersModule, 'useDriverOrders').mockReturnValue({
         orders: [],
         loading: false,
@@ -302,25 +327,25 @@ describe('DriverList', () => {
       });
 
       render(<DriverList />);
-      const viewButton = screen.getAllByRole('button', { name: /view orders/i })[0];
+      const viewButton = screen.getAllByRole('button', { name: /view stops/i })[0];
       fireEvent.click(viewButton);
 
       expect(screen.getByText('No stops assigned yet')).toBeInTheDocument();
     });
 
-    it('should collapse driver orders when "Hide Orders" is clicked', () => {
+    it('should collapse rep stops when "Hide Stops" is clicked', () => {
       render(<DriverList />);
-      const viewButton = screen.getAllByRole('button', { name: /view orders/i })[0];
+      const viewButton = screen.getAllByRole('button', { name: /view stops/i })[0];
 
       // Expand
       fireEvent.click(viewButton);
-      expect(screen.getByText(/hide orders/i)).toBeInTheDocument();
+      expect(screen.getByText(/hide stops/i)).toBeInTheDocument();
 
       // Collapse
-      const hideButton = screen.getByRole('button', { name: /hide orders/i });
+      const hideButton = screen.getByRole('button', { name: /hide stops/i });
       fireEvent.click(hideButton);
 
-      expect(screen.queryByText(/hide orders/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/hide stops/i)).not.toBeInTheDocument();
     });
   });
 });

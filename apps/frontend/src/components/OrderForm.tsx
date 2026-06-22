@@ -28,11 +28,11 @@ export function OrderForm() {
   const validateForm = (): boolean => {
     const errors: FormErrors = {};
 
-    // Customer name validation
+    // Store account validation
     if (!formData.customerName.trim()) {
-      errors.customerName = 'Customer name is required';
+      errors.customerName = 'Store account is required';
     } else if (formData.customerName.length > 255) {
-      errors.customerName = 'Customer name must be less than 255 characters';
+      errors.customerName = 'Store account must be less than 255 characters';
     }
 
     // Customer phone validation
@@ -42,16 +42,16 @@ export function OrderForm() {
       errors.customerPhone = 'Customer phone must be less than 50 characters';
     }
 
-    // Delivery address validation
+    // Store address validation
     if (!formData.deliveryAddress.trim()) {
-      errors.deliveryAddress = 'Delivery address is required';
+      errors.deliveryAddress = 'Store address is required';
     } else if (formData.deliveryAddress.length > 500) {
-      errors.deliveryAddress = 'Delivery address must be less than 500 characters';
+      errors.deliveryAddress = 'Store address must be less than 500 characters';
     }
 
-    // Order details validation (optional but has max length)
+    // Case list validation (optional but has max length)
     if (formData.orderDetails && formData.orderDetails.length > 1000) {
-      errors.orderDetails = 'Order details must be less than 1000 characters';
+      errors.orderDetails = 'Case list must be less than 1000 characters';
     }
 
     setFormErrors(errors);
@@ -105,9 +105,9 @@ export function OrderForm() {
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>Create New Order</CardTitle>
+        <CardTitle>Create New Stop</CardTitle>
         <CardDescription>
-          Enter the details for a new delivery order
+          Enter the details for a new delivery stop
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -116,7 +116,7 @@ export function OrderForm() {
           {success && (
             <div className="p-4 bg-green-50 border border-green-200 rounded-md">
               <p className="text-green-800 text-sm font-medium">
-                Order created successfully!
+                Stop created successfully!
               </p>
             </div>
           )}
@@ -131,14 +131,14 @@ export function OrderForm() {
           {/* Customer Name */}
           <div className="space-y-2">
             <Label htmlFor="customerName">
-              Customer Name <span className="text-red-500">*</span>
+              Store Account <span className="text-red-500">*</span>
             </Label>
             <Input
               id="customerName"
               type="text"
               value={formData.customerName}
               onChange={(e) => handleInputChange('customerName', e.target.value)}
-              placeholder="Enter customer name"
+              placeholder="Enter store account name"
               aria-invalid={!!formErrors.customerName}
               aria-describedby={formErrors.customerName ? 'customerName-error' : undefined}
             />
@@ -173,13 +173,13 @@ export function OrderForm() {
           {/* Delivery Address */}
           <div className="space-y-2">
             <Label htmlFor="deliveryAddress">
-              Delivery Address <span className="text-red-500">*</span>
+              Store Address <span className="text-red-500">*</span>
             </Label>
             <Textarea
               id="deliveryAddress"
               value={formData.deliveryAddress}
               onChange={(e) => handleInputChange('deliveryAddress', e.target.value)}
-              placeholder="Enter delivery address"
+              placeholder="Enter store address"
               rows={3}
               aria-invalid={!!formErrors.deliveryAddress}
               aria-describedby={formErrors.deliveryAddress ? 'deliveryAddress-error' : undefined}
@@ -193,12 +193,12 @@ export function OrderForm() {
 
           {/* Order Details */}
           <div className="space-y-2">
-            <Label htmlFor="orderDetails">Order Details (Optional)</Label>
+            <Label htmlFor="orderDetails">Case List (Optional)</Label>
             <Textarea
               id="orderDetails"
               value={formData.orderDetails}
               onChange={(e) => handleInputChange('orderDetails', e.target.value)}
-              placeholder="Enter any additional details about the order"
+              placeholder="Enter the cases / SKUs for this stop"
               rows={4}
               aria-invalid={!!formErrors.orderDetails}
               aria-describedby={formErrors.orderDetails ? 'orderDetails-error' : undefined}
@@ -213,7 +213,7 @@ export function OrderForm() {
           {/* Submit Button */}
           <div className="pt-4">
             <Button type="submit" disabled={loading} className="w-full">
-              {loading ? 'Creating Order...' : 'Create Order'}
+              {loading ? 'Creating Stop...' : 'Create Stop'}
             </Button>
           </div>
         </form>
