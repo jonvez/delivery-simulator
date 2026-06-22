@@ -67,3 +67,16 @@ Format: `### YYYY-MM-DD — short title` then bullets.
   rejecting — blocking the merge over one peripheral, DSD-neutral label would stall #3/#4 for low
   value. Recorded as an ADR 0006 addendum. This is the "accept against AC, but rule on severity"
   muscle the PO role is supposed to exercise.
+
+### 2026-06-22 — Accept-gate reading caught a license misstatement the prior reviews missed
+- PR #15 (README rewrite) passed dev self-check and an orchestrator full-read (which fixed two
+  other factual bugs). The PO accept-gate read still caught a blocker none of the upstream passes
+  flagged: README declared "License: MIT" while the repo's `LICENSE` file is GPL v3 (committed at
+  initial commit; no package.json license field). Lesson: when a docs PR asserts a *fact about the
+  repo* (license, versions, paths, file existence), verify the assertion against the actual
+  artifact, not just read for tone/accuracy-in-prose. The dev invented a license claim that
+  contradicted a committed file.
+- This also surfaced a guardrail: license choice is an ownership/legal decision (Jon's), not a docs
+  edit — so the PO rejected on accuracy AND escalated the underlying "which license?" question
+  rather than unilaterally patching the README to match the GPL file (which may itself be an
+  unreviewed default). Right separation: PO rules on the artifact defect; Jon owns the license.
