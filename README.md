@@ -56,7 +56,7 @@ domain-agnostic):
 
 ## Tech stack
 
-- **Frontend:** React 18 + TypeScript (Vite), shadcn/ui + Tailwind CSS, Leaflet / OpenStreetMap,
+- **Frontend:** React 19 + TypeScript (Vite), shadcn/ui + Tailwind CSS, Leaflet / OpenStreetMap,
   React Query (30s polling)
 - **Backend:** Node.js 20 + Express + TypeScript, Zod validation, Winston logging
 - **Data:** PostgreSQL + Prisma ORM
@@ -102,8 +102,8 @@ CI=true npm test --workspace=apps/frontend     # frontend (Vitest + Testing Libr
 npm run lint                                   # ESLint across the monorepo
 ```
 
-End-to-end tests (Playwright) live under `tests/e2e/` and require both servers running and a
-seeded database: `npm run test:e2e`.
+End-to-end tests (Playwright) live under `apps/frontend/e2e/` and require both servers running
+and a seeded database: `npm run test:e2e`.
 
 ---
 
@@ -125,9 +125,9 @@ secrets and stay out of the repo.
 delivery-simulator/
 ├── apps/
 │   ├── frontend/          # React + Vite UI (shadcn/ui, Leaflet, React Query)
+│   │   └── e2e/           # Playwright end-to-end tests
 │   └── backend/           # Express + Prisma API
 │       └── prisma/        # schema + migrations
-├── tests/e2e/             # Playwright end-to-end tests
 ├── datadog/               # Datadog Agent integration configs
 ├── docs/
 │   ├── architecture/      # Sharded technical architecture
