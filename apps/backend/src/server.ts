@@ -16,6 +16,18 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
+// CORS allowlist (ADR 0008, security requirement #5).
+// In production, CORS_ORIGIN is the Firebase Hosting URL
+// (e.g. https://<project>.web.app). Supports a comma-separated list.
+// When unset (local dev), default to the Vite dev origin so dev keeps working.
+const DEFAULT_DEV_ORIGINS = ['http://localhost:5173'];
+const corsOrigins = (process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',')
+  : DEFAULT_DEV_ORIGINS
+)
+  .map((origin) => origin.trim())
+  .filter((origin) => origin.length > 0);
+
 // Configure Winston logger
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
@@ -42,7 +54,13 @@ const logger = winston.createLogger({
 });
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: corsOrigins,
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type'],
+  })
+);
 app.use(express.json());
 
 // Request logging middleware
