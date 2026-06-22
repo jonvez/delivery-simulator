@@ -26,29 +26,44 @@ describe('OrderCard', () => {
     expect(screen.getByText('+1234567890')).toBeInTheDocument();
   });
 
-  it('should render delivery address', () => {
+  it('should render store address with DSD label', () => {
     render(<OrderCard order={mockOrder} />);
 
+    expect(screen.getByText('Store Address')).toBeInTheDocument();
     expect(screen.getByText('123 Main St, Apt 4B')).toBeInTheDocument();
   });
 
-  it('should render order details when present', () => {
+  it('should render case list when present', () => {
     render(<OrderCard order={mockOrder} />);
 
+    expect(screen.getByText('Case List')).toBeInTheDocument();
     expect(screen.getByText('Ring doorbell twice')).toBeInTheDocument();
   });
 
-  it('should not render order details section when absent', () => {
+  it('should label assigned rep with DSD vocabulary', () => {
+    const assignedOrder = {
+      ...mockOrder,
+      status: OrderStatus.ASSIGNED,
+      driverId: 'd1',
+      driver: { id: 'd1', name: 'Rep One', isAvailable: true, createdAt: '2024-01-15T10:30:00Z' },
+      assignedAt: '2024-01-15T10:35:00Z',
+    } as Order;
+    render(<OrderCard order={assignedOrder} />);
+
+    expect(screen.getByText('Assigned Rep')).toBeInTheDocument();
+  });
+
+  it('should not render case list section when absent', () => {
     const orderWithoutDetails = { ...mockOrder, orderDetails: null };
     render(<OrderCard order={orderWithoutDetails} />);
 
-    expect(screen.queryByText('Order Details')).not.toBeInTheDocument();
+    expect(screen.queryByText('Case List')).not.toBeInTheDocument();
   });
 
-  it('should display correct status badge for PENDING', () => {
+  it('should display correct status badge for PENDING (Scheduled)', () => {
     render(<OrderCard order={mockOrder} />);
 
-    expect(screen.getByText('Pending')).toBeInTheDocument();
+    expect(screen.getByText('Scheduled')).toBeInTheDocument();
   });
 
   it('should display correct status badge for ASSIGNED', () => {
@@ -63,7 +78,7 @@ describe('OrderCard', () => {
     expect(assignedTexts.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('should display correct status badge for IN_TRANSIT', () => {
+  it('should display correct status badge for IN_TRANSIT (En Route)', () => {
     const inTransitOrder = {
       ...mockOrder,
       status: OrderStatus.IN_TRANSIT,
@@ -72,8 +87,8 @@ describe('OrderCard', () => {
     };
     render(<OrderCard order={inTransitOrder} />);
 
-    const inTransitTexts = screen.getAllByText('In Transit');
-    expect(inTransitTexts.length).toBeGreaterThanOrEqual(1);
+    const enRouteTexts = screen.getAllByText('En Route');
+    expect(enRouteTexts.length).toBeGreaterThanOrEqual(1);
   });
 
   it('should display correct status badge for DELIVERED', () => {
@@ -118,9 +133,9 @@ describe('OrderCard', () => {
     };
     render(<OrderCard order={inTransitOrder} />);
 
-    const inTransitTexts = screen.getAllByText('In Transit');
+    const enRouteTexts = screen.getAllByText('En Route');
     // Should appear in both badge and timestamp
-    expect(inTransitTexts.length).toBe(2);
+    expect(enRouteTexts.length).toBe(2);
   });
 
   it('should show deliveredAt timestamp when present', () => {
@@ -138,9 +153,9 @@ describe('OrderCard', () => {
     expect(deliveredTexts.length).toBe(2);
   });
 
-  it('should display truncated order ID', () => {
+  it('should display truncated stop ID', () => {
     render(<OrderCard order={mockOrder} />);
 
-    expect(screen.getByText(/Order ID: 123e4567.../)).toBeInTheDocument();
+    expect(screen.getByText(/Stop ID: 123e4567.../)).toBeInTheDocument();
   });
 });

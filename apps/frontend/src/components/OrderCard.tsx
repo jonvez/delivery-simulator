@@ -21,9 +21,9 @@ const statusColors: Record<OrderStatus, 'default' | 'secondary' | 'destructive' 
 };
 
 const statusLabels: Record<OrderStatus, string> = {
-  [OrderStatus.PENDING]: 'Pending',
+  [OrderStatus.PENDING]: 'Scheduled',
   [OrderStatus.ASSIGNED]: 'Assigned',
-  [OrderStatus.IN_TRANSIT]: 'In Transit',
+  [OrderStatus.IN_TRANSIT]: 'En Route',
   [OrderStatus.DELIVERED]: 'Delivered',
 };
 
@@ -70,7 +70,7 @@ export function OrderCard({ order, availableDrivers = [], onAssignDriver, assign
       <CardContent className="space-y-3">
         <div>
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
-            Delivery Address
+            Store Address
           </p>
           <p className="text-sm">{order.deliveryAddress}</p>
         </div>
@@ -78,7 +78,7 @@ export function OrderCard({ order, availableDrivers = [], onAssignDriver, assign
         {order.orderDetails && (
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
-              Order Details
+              Case List
             </p>
             <p className="text-sm">{order.orderDetails}</p>
           </div>
@@ -88,7 +88,7 @@ export function OrderCard({ order, availableDrivers = [], onAssignDriver, assign
         {order.driver && (
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
-              Assigned Driver
+              Assigned Rep
             </p>
             <p className="text-sm font-medium">{order.driver.name}</p>
           </div>
@@ -98,7 +98,7 @@ export function OrderCard({ order, availableDrivers = [], onAssignDriver, assign
         {canReassign && (
           <div className="pt-2 border-t space-y-2">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Reassign to Different Driver
+              Reassign to Different Rep
             </p>
             <div className="flex gap-2 flex-wrap">
               {availableDrivers
@@ -133,7 +133,7 @@ export function OrderCard({ order, availableDrivers = [], onAssignDriver, assign
         {canAssign && (
           <div className="pt-2 border-t space-y-2">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Assign to Driver
+              Assign to Rep
             </p>
             <div className="flex gap-2 flex-wrap">
               {availableDrivers.map((driver) => (
@@ -176,7 +176,7 @@ export function OrderCard({ order, availableDrivers = [], onAssignDriver, assign
             )}
             {order.inTransitAt && (
               <div>
-                <p className="font-medium text-muted-foreground">In Transit</p>
+                <p className="font-medium text-muted-foreground">En Route</p>
                 <p>{formatDate(order.inTransitAt)}</p>
               </div>
             )}
@@ -191,7 +191,7 @@ export function OrderCard({ order, availableDrivers = [], onAssignDriver, assign
 
         <div className="pt-1">
           <p className="text-xs text-muted-foreground">
-            Order ID: {order.id.slice(0, 8)}...
+            Stop ID: {order.id.slice(0, 8)}...
           </p>
         </div>
       </CardContent>

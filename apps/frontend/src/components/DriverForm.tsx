@@ -27,12 +27,12 @@ export function DriverForm({ onDriverCreated }: DriverFormProps) {
 
     // Validation
     if (!name.trim()) {
-      setNameError('Driver name is required');
+      setNameError('Rep name is required');
       return;
     }
 
     if (name.length > 255) {
-      setNameError('Driver name must be less than 255 characters');
+      setNameError('Rep name must be less than 255 characters');
       return;
     }
 
@@ -56,11 +56,11 @@ export function DriverForm({ onDriverCreated }: DriverFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg">
-      <h3 className="text-lg font-semibold">Add New Driver</h3>
+      <h3 className="text-lg font-semibold">Add New Rep</h3>
 
       {success && (
         <div className="p-3 bg-green-50 border border-green-200 rounded text-green-800 text-sm">
-          Driver created successfully!
+          Rep created successfully!
         </div>
       )}
 
@@ -71,13 +71,13 @@ export function DriverForm({ onDriverCreated }: DriverFormProps) {
       )}
 
       <div className="space-y-2">
-        <Label htmlFor="name">Driver Name *</Label>
+        <Label htmlFor="name">Rep Name *</Label>
         <Input
           id="name"
           type="text"
           value={name}
           onChange={(e) => handleNameChange(e.target.value)}
-          placeholder="Enter driver name"
+          placeholder="Enter rep name"
           disabled={loading}
           className={nameError ? 'border-red-500' : ''}
         />
@@ -100,7 +100,7 @@ export function DriverForm({ onDriverCreated }: DriverFormProps) {
       </div>
 
       <Button type="submit" disabled={loading} className="w-full">
-        {loading ? 'Creating Driver...' : 'Create Driver'}
+        {loading ? 'Creating Rep...' : 'Create Rep'}
       </Button>
     </form>
   );

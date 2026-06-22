@@ -95,7 +95,7 @@ describe('DriverList', () => {
       });
 
       render(<DriverList />);
-      expect(screen.getByText('Loading drivers...')).toBeInTheDocument();
+      expect(screen.getByText('Loading reps...')).toBeInTheDocument();
     });
   });
 
@@ -137,7 +137,7 @@ describe('DriverList', () => {
       });
 
       render(<DriverList />);
-      expect(screen.getByText(/no drivers yet/i)).toBeInTheDocument();
+      expect(screen.getByText(/no reps yet/i)).toBeInTheDocument();
     });
 
     it('should allow refreshing in empty state', () => {
@@ -162,12 +162,12 @@ describe('DriverList', () => {
       expect(screen.getByText('Jane Smith')).toBeInTheDocument();
     });
 
-    it('should display driver count correctly', () => {
+    it('should display rep count correctly', () => {
       render(<DriverList />);
-      expect(screen.getByText('(2 drivers)')).toBeInTheDocument();
+      expect(screen.getByText('(2 reps)')).toBeInTheDocument();
     });
 
-    it('should display singular form for one driver', () => {
+    it('should display singular form for one rep', () => {
       vi.spyOn(useDriversModule, 'useDrivers').mockReturnValue({
         drivers: [mockDrivers[0]],
         loading: false,
@@ -176,15 +176,15 @@ describe('DriverList', () => {
       });
 
       render(<DriverList />);
-      expect(screen.getByText('(1 driver)')).toBeInTheDocument();
+      expect(screen.getByText('(1 rep)')).toBeInTheDocument();
     });
 
-    it('should display availability status correctly', () => {
+    it('should display availability status with DSD vocabulary', () => {
       render(<DriverList />);
-      const availableBadges = screen.getAllByText('Available');
-      const unavailableBadges = screen.getAllByText('Unavailable');
-      expect(availableBadges).toHaveLength(1);
-      expect(unavailableBadges).toHaveLength(1);
+      const onRouteBadges = screen.getAllByText('On Route');
+      const offRouteBadges = screen.getAllByText('Off Route');
+      expect(onRouteBadges).toHaveLength(1);
+      expect(offRouteBadges).toHaveLength(1);
     });
 
     it('should call refetch when refresh button is clicked', () => {
@@ -195,22 +195,22 @@ describe('DriverList', () => {
     });
   });
 
-  describe('Driver Availability Toggle', () => {
-    it('should show "Mark Unavailable" button for available drivers', () => {
+  describe('Rep Availability Toggle', () => {
+    it('should show "Mark Off Route" button for on-route reps', () => {
       render(<DriverList />);
-      expect(screen.getByRole('button', { name: /mark unavailable/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /mark off route/i })).toBeInTheDocument();
     });
 
-    it('should show "Mark Available" button for unavailable drivers', () => {
+    it('should show "Mark On Route" button for off-route reps', () => {
       render(<DriverList />);
-      expect(screen.getByRole('button', { name: /mark available/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /mark on route/i })).toBeInTheDocument();
     });
 
     it('should call updateDriver when toggling availability', async () => {
       mockUpdateDriver.mockResolvedValue(mockDrivers[0]);
 
       render(<DriverList />);
-      const toggleButton = screen.getByRole('button', { name: /mark unavailable/i });
+      const toggleButton = screen.getByRole('button', { name: /mark off route/i });
       fireEvent.click(toggleButton);
 
       expect(mockUpdateDriver).toHaveBeenCalledWith('1', { isAvailable: false });
@@ -220,7 +220,7 @@ describe('DriverList', () => {
       mockUpdateDriver.mockResolvedValue(mockDrivers[0]);
 
       render(<DriverList />);
-      const toggleButton = screen.getByRole('button', { name: /mark unavailable/i });
+      const toggleButton = screen.getByRole('button', { name: /mark off route/i });
       fireEvent.click(toggleButton);
 
       await vi.waitFor(() => {
@@ -232,7 +232,7 @@ describe('DriverList', () => {
       mockUpdateDriver.mockResolvedValue(null);
 
       render(<DriverList />);
-      const toggleButton = screen.getByRole('button', { name: /mark unavailable/i });
+      const toggleButton = screen.getByRole('button', { name: /mark off route/i });
       fireEvent.click(toggleButton);
 
       await vi.waitFor(() => {
@@ -305,7 +305,7 @@ describe('DriverList', () => {
       const viewButton = screen.getAllByRole('button', { name: /view orders/i })[0];
       fireEvent.click(viewButton);
 
-      expect(screen.getByText('No orders assigned yet')).toBeInTheDocument();
+      expect(screen.getByText('No stops assigned yet')).toBeInTheDocument();
     });
 
     it('should collapse driver orders when "Hide Orders" is clicked', () => {
