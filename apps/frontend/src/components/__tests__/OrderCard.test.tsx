@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { OrderCard } from '../OrderCard';
 import type { Order } from '../../types/order';
 import { OrderStatus } from '../../types/order';
@@ -12,6 +12,12 @@ describe('OrderCard', () => {
     deliveryAddress: '123 Main St, Apt 4B',
     orderDetails: 'Ring doorbell twice',
     status: OrderStatus.PENDING,
+    latitude: null,
+    longitude: null,
+    driverId: null,
+    driver: null,
+    planogramReviewed: false,
+    planogramNotes: null,
     createdAt: '2024-01-15T10:30:00Z',
     assignedAt: null,
     inTransitAt: null,
@@ -157,5 +163,58 @@ describe('OrderCard', () => {
     render(<OrderCard order={mockOrder} />);
 
     expect(screen.getByText(/Stop ID: 123e4567.../)).toBeInTheDocument();
+  });
+
+  describe('planogram compliance', () => {
+    it('should render the planogram-review toggle with DSD vocabulary', () => {
+      render(<OrderCard order={mockOrder} />);
+
+      expect(screen.getByText('Planogram reviewed')).toBeInTheDocument();
+      const toggle = screen.getByRole('checkbox', { name: /planogram reviewed/i });
+      expect(toggle).not.toBeChecked();
+    });
+
+    it('should reflect a previously reviewed planogram as checked with its notes', () => {
+      const reviewedOrder: Order = {
+        ...mockOrder,
+        planogramReviewed: true,
+        planogramNotes: 'Endcap reset, facings squared',
+      };
+      render(<OrderCard order={reviewedOrder} />);
+
+      const toggle = screen.getByRole('checkbox', { name: /planogram reviewed/i });
+      expect(toggle).toBeChecked();
+      expect(screen.getByDisplayValue('Endcap reset, facings squared')).toBeInTheDocument();
+    });
+
+    it('should call onReviewPlanogram with the new reviewed flag and notes when saved', async () => {
+      const onReviewPlanogram = vi.fn().mockResolvedValue(undefined);
+      render(<OrderCard order={mockOrder} onReviewPlanogram={onReviewPlanogram} />);
+
+      // Toggle reviewed on
+      const toggle = screen.getByRole('checkbox', { name: /planogram reviewed/i });
+      fireEvent.click(toggle);
+
+      // Enter compliance notes
+      const notes = screen.getByLabelText(/compliance notes/i);
+      fireEvent.change(notes, { target: { value: 'Cooler door planogram verified' } });
+
+      // Save
+      const saveButton = screen.getByRole('button', { name: /save planogram review/i });
+      fireEvent.click(saveButton);
+
+      await waitFor(() => {
+        expect(onReviewPlanogram).toHaveBeenCalledWith(mockOrder.id, {
+          planogramReviewed: true,
+          planogramNotes: 'Cooler door planogram verified',
+        });
+      });
+    });
+
+    it('should not render save action when no onReviewPlanogram handler is provided', () => {
+      render(<OrderCard order={mockOrder} />);
+
+      expect(screen.queryByRole('button', { name: /save planogram review/i })).not.toBeInTheDocument();
+    });
   });
 });

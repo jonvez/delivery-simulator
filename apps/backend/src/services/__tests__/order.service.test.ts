@@ -323,6 +323,106 @@ describe('OrderService', () => {
     });
   });
 
+  describe('reviewPlanogram', () => {
+    it('should set planogramReviewed and planogramNotes on the order', async () => {
+      const mockUpdatedOrder = {
+        id: 'test-id-123',
+        customerName: 'John Doe',
+        customerPhone: '+1234567890',
+        deliveryAddress: '123 Main St',
+        orderDetails: null,
+        status: OrderStatus.PENDING,
+        planogramReviewed: true,
+        planogramNotes: 'Endcap reset complete',
+        createdAt: new Date(),
+        assignedAt: null,
+        inTransitAt: null,
+        deliveredAt: null,
+        updatedAt: new Date(),
+      };
+
+      (mockPrisma.order.update as any).mockResolvedValue(mockUpdatedOrder);
+
+      const result = await orderService.reviewPlanogram('test-id-123', {
+        planogramReviewed: true,
+        planogramNotes: 'Endcap reset complete',
+      });
+
+      expect(mockPrisma.order.update).toHaveBeenCalledWith({
+        where: { id: 'test-id-123' },
+        data: {
+          planogramReviewed: true,
+          planogramNotes: 'Endcap reset complete',
+        },
+      });
+      expect(result).toEqual(mockUpdatedOrder);
+      expect(result.planogramReviewed).toBe(true);
+      expect(result.planogramNotes).toBe('Endcap reset complete');
+    });
+
+    it('should allow clearing planogramNotes by passing null', async () => {
+      const mockUpdatedOrder = {
+        id: 'test-id-123',
+        customerName: 'John Doe',
+        customerPhone: '+1234567890',
+        deliveryAddress: '123 Main St',
+        orderDetails: null,
+        status: OrderStatus.PENDING,
+        planogramReviewed: false,
+        planogramNotes: null,
+        createdAt: new Date(),
+        assignedAt: null,
+        inTransitAt: null,
+        deliveredAt: null,
+        updatedAt: new Date(),
+      };
+
+      (mockPrisma.order.update as any).mockResolvedValue(mockUpdatedOrder);
+
+      await orderService.reviewPlanogram('test-id-123', {
+        planogramReviewed: false,
+        planogramNotes: null,
+      });
+
+      expect(mockPrisma.order.update).toHaveBeenCalledWith({
+        where: { id: 'test-id-123' },
+        data: {
+          planogramReviewed: false,
+          planogramNotes: null,
+        },
+      });
+    });
+
+    it('should update only planogramReviewed when notes are omitted', async () => {
+      const mockUpdatedOrder = {
+        id: 'test-id-123',
+        customerName: 'John Doe',
+        customerPhone: '+1234567890',
+        deliveryAddress: '123 Main St',
+        orderDetails: null,
+        status: OrderStatus.PENDING,
+        planogramReviewed: true,
+        planogramNotes: null,
+        createdAt: new Date(),
+        assignedAt: null,
+        inTransitAt: null,
+        deliveredAt: null,
+        updatedAt: new Date(),
+      };
+
+      (mockPrisma.order.update as any).mockResolvedValue(mockUpdatedOrder);
+
+      await orderService.reviewPlanogram('test-id-123', {
+        planogramReviewed: true,
+      });
+
+      const callArgs = (mockPrisma.order.update as any).mock.calls[0][0];
+      expect(callArgs.where).toEqual({ id: 'test-id-123' });
+      expect(callArgs.data.planogramReviewed).toBe(true);
+      expect(callArgs.data).not.toHaveProperty('planogramNotes');
+    });
+  });
+
   describe('deleteOrder', () => {
     it('should delete an order by id', async () => {
       const mockDeletedOrder = {
