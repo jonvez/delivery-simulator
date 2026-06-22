@@ -1,500 +1,152 @@
-# Delivery Manager Application
+# DSD Route Manager
 
-A web-based system for managing restaurant delivery operations.
+**Direct Store Delivery (DSD) for convenience-store distribution.** A standalone,
+web-based route-operations demo: schedule store stops, coordinate route reps, assign work,
+track each stop through its lifecycle, and view live routes on a map — with **no POS or
+external-system dependency**.
 
-## Overview
+Built solo with [Claude Code](https://claude.com/claude-code) / AI-assisted tooling, reframed
+from a generic delivery app into the DSD / convenience-store domain.
 
-The Delivery Manager Application provides dispatchers with a centralized dashboard to manage:
-- Order intake and lifecycle tracking
-- Driver assignment and availability
-- Route visualization on interactive maps
-- Real-time status updates via polling
+- **Live demo:** _coming soon_ (Railway backend + Postgres · Vercel frontend — see
+  [`docs/DEPLOYMENT_GUIDE.md`](docs/DEPLOYMENT_GUIDE.md))
+- **Repo:** https://github.com/jonvez/delivery-simulator
+- **Product spec:** [`SPEC.md`](SPEC.md) · **Process:** [`TEAM.md`](TEAM.md) ·
+  **Decisions:** [`docs/decisions/`](docs/decisions/) · **Architecture:** [`docs/architecture/`](docs/architecture/)
 
-## Tech Stack
+---
 
-### Frontend
-- **React 18+** with TypeScript
-- **Vite** for fast development and building
-- **shadcn/ui** component library with Tailwind CSS
-- **Leaflet** for map visualization
-- **React Router** for client-side routing
+## What it does
 
-### Backend
-- **Node.js 20 LTS** with Express
-- **TypeScript** for type safety
-- **PostgreSQL 14+** with Prisma ORM
-- **Zod** for runtime validation
-- **Winston** for logging
+A dispatcher / route manager gets at-a-glance control of a DSD operation:
 
-### Testing
-- **Vitest** + React Testing Library (frontend)
-- **Jest** + Supertest (backend)
-- **Playwright** (end-to-end)
+- **Stop intake** — create store stops with a Store Account, Store Address, and Case List.
+- **Rep & route coordination** — manage route reps and their On Route / Off Route status.
+- **Assignment** — assign (and reassign) stops to reps.
+- **Status tracking** — every stop moves through the lifecycle
+  **Scheduled → Assigned → En Route → Delivered**, refreshed via 30-second polling.
+- **Route visualization** — interactive Leaflet / OpenStreetMap map of a rep's assigned
+  stops and their sequence.
 
-## Project Structure
+### DSD vocabulary
 
-```
-delivery-simulator/
-├── apps/
-│   ├── frontend/          # React frontend application
-│   └── backend/           # Node.js Express backend
-├── packages/              # Shared packages (future)
-├── tests/
-│   └── e2e/              # Playwright E2E tests
-├── docs/                  # Project documentation
-│   ├── architecture.md   # Technical architecture
-│   ├── architecture/     # Sharded architecture docs
-│   └── decisions/        # ADR log
-├── SPEC.md               # Product spec (single source of truth)
-├── TEAM.md               # Build team & process
-```
+The UI speaks the DSD operating model (display labels; the underlying schema stays
+domain-agnostic):
 
-## Getting Started
+| Term | Meaning |
+|------|---------|
+| **Stop** | A scheduled store delivery |
+| **Rep** | A route rep who runs the stops |
+| **Store Account** | The convenience store being served |
+| **Store Address** | Where the stop is delivered |
+| **Case List** | What's being dropped at the stop |
+| **Stop ID** | Stable identifier for a stop |
+| **On Route / Off Route** | A rep's availability |
+| **Scheduled → Assigned → En Route → Delivered** | Stop lifecycle |
 
-### Prerequisites
+## Signature features
 
-- Node.js 20 LTS or higher
-- npm 10+
-- Docker (recommended) OR PostgreSQL 14+ installed locally
-- Git
+1. **Per-Account view** — manage the account, not just the drop. Per-store delivery history,
+   total drops, and last visit, aggregated from existing stops.
+   Backend `GET /api/orders/by-store`; frontend `StoreHistory` component.
+2. **Planogram-compliance check** — a rep marks a stop "planogram reviewed" and adds notes, a
+   DSD merchandising touch surfaced as a badge/toggle on the stop card.
+   Backend `PATCH /api/orders/:id/planogram` (small Prisma migration adds
+   `planogramReviewed` / `planogramNotes`).
 
-### Installation
+## Tech stack
 
-1. Clone the repository:
+- **Frontend:** React 19 + TypeScript (Vite), shadcn/ui + Tailwind CSS, Leaflet / OpenStreetMap,
+  React Query (30s polling)
+- **Backend:** Node.js 20 + Express + TypeScript, Zod validation, Winston logging
+- **Data:** PostgreSQL + Prisma ORM
+- **Monorepo:** npm workspaces (`apps/frontend`, `apps/backend`)
+- **Observability:** Datadog — APM tracing, log management, PostgreSQL metrics, and RUM
+
+---
+
+## Local development
+
+Verified quickstart (macOS / Docker):
+
 ```bash
-git clone <repository-url>
-cd delivery-simulator
-```
+# 1. Postgres only — the datadog-agent service needs a DD_API_KEY, so don't bring up the
+#    whole compose stack.
+docker compose up -d postgres
 
-2. Install dependencies:
-```bash
-npm install
-```
+# 2. Point the backend at the database.
+export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/delivery_manager"
 
-3. Set up environment variables:
-```bash
-cp apps/backend/.env.example apps/backend/.env
-# Edit apps/backend/.env with your database credentials
-```
-
-4. Start the PostgreSQL database:
-
-**Option A: Using Docker (Recommended)**
-```bash
-docker compose up -d
-```
-
-**Option B: Using Local PostgreSQL**
-```bash
-# Ensure PostgreSQL 14+ is installed and running
-createdb delivery_manager
-```
-
-5. Run database migrations:
-```bash
+# 3. Migrate, generate the Prisma client, and seed DSD demo data.
 cd apps/backend
-npx prisma migrate dev
-```
+npx prisma migrate deploy
+npx prisma generate
+npm run seed
 
-6. Start development servers:
-```bash
+# 4. Start both apps from the repo root.
 cd ../..
 npm run dev
 ```
 
-This will start both frontend (http://localhost:5173) and backend (http://localhost:3001).
+- Frontend: http://localhost:5173
+- Backend: http://localhost:3001
 
-## Available Scripts
+Seeding produces route reps, store-account stops, and Brooklyn, NY store locations.
 
-### Root Directory
-- `npm run dev` - Start both frontend and backend dev servers
-- `npm run build` - Build all workspaces
-- `npm test` - Run tests in all workspaces
-- `npm run lint` - Lint all TypeScript files
-- `npm run format` - Format code with Prettier
+### Tests, build & lint
 
-### Frontend (`apps/frontend`)
-- `npm run dev` - Start Vite dev server (http://localhost:5173)
-- `npm run build` - Build for production
-- `npm test` - Run Vitest unit tests
-- `npm run test:watch` - Run tests in watch mode
-- `npm run test:coverage` - Run tests with coverage report
-- `npm run test:e2e` - Run Playwright E2E tests
-- `npm run test:e2e:ui` - Run E2E tests with UI
-- `npm run test:e2e:debug` - Debug E2E tests
-- `npm run lint` - Lint frontend code
+```bash
+npm run build                                  # build both workspaces (TypeScript)
+cd apps/backend && npm test                    # backend (Jest + Supertest)
+CI=true npm test --workspace=apps/frontend     # frontend (Vitest + Testing Library)
+npm run lint                                   # ESLint across the monorepo
+```
 
-### Backend (`apps/backend`)
-- `npm run dev` - Start backend with hot reload (http://localhost:3001)
-- `npm run build` - Compile TypeScript
-- `npm run start` - Run compiled server
-- `npm test` - Run Jest unit tests
-- `npm run test:integration` - Run API integration tests
-- `npm run seed:data` - Seed database with sample Brooklyn data
-- `npm run reset:data` - Clear all data from database
-
-## Development Workflow
-
-This project is built by a small team of Claude Code persona subagents (Product Owner,
-Architect, Designer, Developers, QA) coordinated through a GitHub Projects board and an
-ADR log. See [`TEAM.md`](TEAM.md) for the full process and [`SPEC.md`](SPEC.md) for the
-product spec.
-
-## Documentation
-
-- [Product Spec](SPEC.md) - Single source of product truth (folds the former brief + PRD)
-- [Architecture](docs/architecture.md) - Full technical architecture
-- [Decisions](docs/decisions/) - ADR log
-- [Process](TEAM.md) - Build team & process
-
-## MVP Scope
-
-The MVP includes:
-- ✅ Order management (create, view, update status)
-- ✅ Driver management (add, view availability, assign orders)
-- ✅ Interactive map with delivery locations
-- ✅ Route visualization with suggested sequences
-- ✅ Dashboard with status-grouped orders
-- ✅ 30-second polling for real-time updates
-- ✅ Seed data with Brooklyn, NY addresses
-- ✅ Comprehensive test suite
-
-## Future Enhancements
-
-Post-MVP features planned:
-- Real-time updates via WebSockets
-- Smart route optimization algorithms
-- Driver mobile interface
-- Customer tracking portal
-- Analytics dashboard
-- User authentication
+End-to-end tests (Playwright) live under `apps/frontend/e2e/` and require both servers running
+and a seeded database: `npm run test:e2e`.
 
 ---
 
-## Running Tests
+## Deployment
 
-### Unit Tests
+The intended hosting is a public deployment: **Railway** for the backend + PostgreSQL and
+**Vercel** for the frontend. Step-by-step instructions (including the environment variables and
+guided logins) are in [`docs/DEPLOYMENT_GUIDE.md`](docs/DEPLOYMENT_GUIDE.md).
 
-**Frontend Unit Tests (Vitest + React Testing Library)**
-```bash
-cd apps/frontend
-npm test                    # Run tests once
-npm run test:watch          # Run tests in watch mode
-npm run test:coverage       # Run tests with coverage report (target: >70%)
-```
-
-**Backend Unit Tests (Jest)**
-```bash
-cd apps/backend
-npm test                    # Run all backend tests
-```
-
-### Integration Tests
-
-Tests API endpoints with a real database:
-```bash
-cd apps/backend
-npm run test:integration
-```
-
-This will:
-- Start a test database
-- Run migrations
-- Test all CRUD operations
-- Clean up test data
-
-### End-to-End Tests
-
-Tests complete user workflows with Playwright:
-```bash
-cd apps/frontend
-npm run test:e2e            # Run E2E tests in headless mode
-npm run test:e2e:ui         # Run with Playwright UI for debugging
-npm run test:e2e:debug      # Run in debug mode with step-by-step execution
-```
-
-**Prerequisites for E2E tests:**
-- Both frontend and backend servers must be running
-- Database should be seeded with test data
-
-### Running All Tests
-
-From the project root:
-```bash
-npm test                    # Runs tests in all workspaces
-```
+Configuration lives in env vars, never in code — see `apps/backend/.env.example` and
+`apps/frontend/.env.example`. The Datadog `DATABASE_URL`, `DD_API_KEY`, and deploy tokens are
+secrets and stay out of the repo.
 
 ---
 
-## Managing Demo Data
-
-### Seeding Data
-
-Populate the database with sample orders and drivers using Brooklyn, NY addresses:
-
-```bash
-cd apps/backend
-npm run seed:data
-```
-
-This creates:
-- 10 sample orders with various statuses
-- 5 sample drivers
-- All addresses are valid Brooklyn locations
-- Data is suitable for testing and demos
-
-### Resetting Data
-
-Clear all orders and drivers from the database:
-
-```bash
-cd apps/backend
-npm run reset:data
-```
-
-**Warning:** This permanently deletes all data. Use with caution!
-
-**Use Cases:**
-- Start fresh for demos
-- Clear test data
-- Reset to known state before manual testing
-
----
-
-## Architecture
-
-This application follows a modern full-stack architecture with clear separation of concerns:
-
-### High-Level Overview
+## Project structure
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                        Browser                               │
-│  ┌────────────────────────────────────────────────────────┐ │
-│  │  React Frontend (Vite)                                 │ │
-│  │  - shadcn/ui Components                                │ │
-│  │  - Leaflet Maps                                        │ │
-│  │  - React Query (30s polling)                           │ │
-│  └─────────────────┬──────────────────────────────────────┘ │
-└────────────────────┼────────────────────────────────────────┘
-                     │ HTTP/REST API
-                     │
-┌────────────────────▼────────────────────────────────────────┐
-│  Backend Server (Node.js + Express + TypeScript)            │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │  REST API Layer                                       │  │
-│  │  - Order Management Endpoints                         │  │
-│  │  - Driver Management Endpoints                        │  │
-│  │  - Zod Validation                                     │  │
-│  └──────────────────┬────────────────────────────────────┘  │
-│                     │                                        │
-│  ┌──────────────────▼────────────────────────────────────┐  │
-│  │  Service Layer                                        │  │
-│  │  - Business Logic                                     │  │
-│  │  - Data Transformations                               │  │
-│  └──────────────────┬────────────────────────────────────┘  │
-│                     │                                        │
-│  ┌──────────────────▼────────────────────────────────────┐  │
-│  │  Prisma ORM                                           │  │
-│  │  - Type-safe database access                          │  │
-│  │  - Migrations                                         │  │
-│  └──────────────────┬────────────────────────────────────┘  │
-└────────────────────┼────────────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────────────┐
-│  PostgreSQL Database                                         │
-│  - Orders, Drivers, Assignments                              │
-│  - Relational data with foreign keys                         │
-└──────────────────────────────────────────────────────────────┘
+delivery-simulator/
+├── apps/
+│   ├── frontend/          # React + Vite UI (shadcn/ui, Leaflet, React Query)
+│   │   └── e2e/           # Playwright end-to-end tests
+│   └── backend/           # Express + Prisma API
+│       └── prisma/        # schema + migrations
+├── datadog/               # Datadog Agent integration configs
+├── docs/
+│   ├── architecture/      # Sharded technical architecture
+│   ├── decisions/         # ADR log
+│   └── DEPLOYMENT_GUIDE.md
+├── SPEC.md                # Product spec (single source of product truth)
+├── TEAM.md                # Build team & process
+└── PLAN.md                # Live execution context for the DSD reframe
 ```
 
-### Key Architectural Decisions
+## How it's built
 
-1. **Monorepo Structure**: Uses npm workspaces for frontend/backend separation
-2. **TypeScript Throughout**: End-to-end type safety from database to UI
-3. **Polling vs WebSockets**: Simple 30-second polling for MVP (WebSockets planned for v2)
-4. **RESTful API**: Standard REST endpoints for CRUD operations
-5. **Prisma ORM**: Type-safe database access with automatic migrations
-6. **Component-Based UI**: Reusable shadcn/ui components with Tailwind CSS
-
-For detailed architecture documentation, see:
-- [Full Architecture Doc](docs/architecture.md)
-- [Data Models](apps/backend/prisma/schema.prisma)
-
----
-
-## Known Limitations
-
-### Current MVP Limitations
-
-1. **No Real-Time Updates**
-   - Uses 30-second polling instead of WebSockets
-   - Updates may appear delayed by up to 30 seconds
-   - Planned for post-MVP
-
-2. **Basic Route Visualization**
-   - Routes shown are simple point-to-point lines
-   - No actual turn-by-turn directions
-   - No route optimization algorithm
-   - Planned: Integration with routing APIs (OSRM, Google Maps)
-
-3. **No Authentication**
-   - Application is open to anyone with the URL
-   - No user accounts or permissions
-   - Planned: JWT-based authentication with role-based access
-
-4. **Limited Map Functionality**
-   - Map is view-only (no drawing/editing)
-   - No live driver location tracking
-   - Addresses must be manually geocoded
-   - Planned: Live GPS tracking, geofence alerts
-
-5. **Brooklyn-Only Test Data**
-   - Seed data uses only Brooklyn, NY addresses
-   - No validation for addresses outside Brooklyn
-   - Application works globally but test data is localized
-
-6. **No Order History Search**
-   - Limited filtering and search capabilities
-   - All orders shown in single list
-   - Planned: Advanced filtering, date ranges, search
-
-7. **Basic Error Handling**
-   - Generic error messages
-   - Limited retry logic
-   - Planned: Detailed error states, automatic retries
-
-8. **Performance with Large Datasets**
-   - Not optimized for 1000+ orders
-   - Map may slow down with many markers
-   - Planned: Pagination, clustering, virtual scrolling
-
----
-
-## Contributing
-
-We welcome contributions to this learning project! Here's how to get started:
-
-### Code Style
-
-This project follows strict TypeScript and React best practices:
-
-**TypeScript**
-- Use strict mode (`"strict": true` in tsconfig.json)
-- Avoid `any` types - use proper typing or `unknown`
-- Prefer interfaces over types for object shapes
-- Use Zod for runtime validation
-
-**React/Frontend**
-- Use functional components with hooks
-- Follow React Query best practices for data fetching
-- Use shadcn/ui components when possible
-- Keep components small and focused (Single Responsibility)
-- Use React Testing Library for component tests
-
-**Backend**
-- Follow REST API best practices
-- Use Prisma for all database access
-- Validate all inputs with Zod schemas
-- Use proper HTTP status codes
-- Write integration tests for all endpoints
-
-**General**
-- Use ESLint and Prettier for formatting
-- Run `npm run lint` and `npm run format` before committing
-- Write meaningful commit messages
-- Keep functions small (<50 lines when possible)
-
-### Pull Request Process
-
-1. **Fork and Clone**
-   ```bash
-   git clone https://github.com/your-username/delivery-simulator.git
-   cd delivery-simulator
-   git checkout -b feature/your-feature-name
-   ```
-
-2. **Make Changes**
-   - Write code following the style guide above
-   - Add tests for new features
-   - Update documentation if needed
-   - Ensure all tests pass locally
-
-3. **Test Your Changes**
-   ```bash
-   npm run lint                      # Check for lint errors
-   npm test                          # Run all tests
-   cd apps/frontend && npm run test:coverage  # Check coverage >70%
-   cd apps/frontend && npm run test:e2e       # Run E2E tests
-   ```
-
-4. **Commit and Push**
-   ```bash
-   git add .
-   git commit -m "feat: add your feature description"
-   git push origin feature/your-feature-name
-   ```
-
-5. **Create Pull Request**
-   - Go to GitHub and create a PR from your fork
-   - Fill in the PR template with:
-     - Description of changes
-     - Related issue numbers (if any)
-     - Testing performed
-     - Screenshots (for UI changes)
-
-6. **Code Review**
-   - Address any feedback from reviewers
-   - Keep PR scope focused and small
-   - Respond to comments promptly
-
-### Commit Message Convention
-
-Follow conventional commits format:
-- `feat: add new feature`
-- `fix: resolve bug in order assignment`
-- `docs: update README with new instructions`
-- `test: add unit tests for DriverList`
-- `refactor: simplify order status logic`
-- `chore: update dependencies`
-
-### Testing Guidelines
-
-All PRs must include appropriate tests:
-- **Unit tests**: For new components, utilities, or business logic
-- **Integration tests**: For new API endpoints
-- **E2E tests**: For new user-facing features or critical workflows
-- Maintain >70% code coverage for frontend and backend
-
-### Questions?
-
-- Check existing issues and discussions
-- Review the [Product Spec](SPEC.md) for feature context
-- Consult the [Architecture doc](docs/architecture.md) for technical decisions
-
----
-
-## Manual Testing
-
-For comprehensive manual testing procedures, see [Manual Testing Checklist](docs/MANUAL_TESTING_CHECKLIST.md).
-
-The checklist covers:
-- Order management workflows
-- Driver management and assignment
-- Map visualization
-- Error handling
-- Cross-browser compatibility
-- Performance testing
-
----
+This is a brownfield app being evolved by a small team of Claude Code persona subagents
+(Product Owner, Architect, Designer, Developers, QA) coordinated through a GitHub Projects board
+and an ADR log, working test-first. See [`TEAM.md`](TEAM.md) for the process and
+[`SPEC.md`](SPEC.md) for the product spec.
 
 ## License
 
 MIT
-
-## Support
-
-For issues, questions, or suggestions:
-- Open an issue on GitHub
-- Check the [docs](docs/) folder for detailed documentation
-- Review the PRD for product context
+</content>
+</invoke>
