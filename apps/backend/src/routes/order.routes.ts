@@ -48,6 +48,19 @@ router.get('/', async (req: Request, res: Response, next: NextFunction): Promise
   }
 });
 
+// GET /api/orders/by-store - Per-Account view aggregation (Issue #3)
+// Returns per-store-account aggregates: stop history, total drops, last visit.
+// IMPORTANT: This route must come BEFORE /:id routes so "by-store" is not
+// captured as an order id.
+router.get('/by-store', async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const accounts = await orderService.getOrdersByStore();
+    res.json(accounts);
+  } catch (error) {
+    next(error);
+  }
+});
+
 // PATCH /api/orders/:id/assign - Assign order to driver
 // Story 3.5: Implement Order Assignment to Drivers
 // Story 3.6: Extended to support reassignment

@@ -131,6 +131,67 @@ describe('Order Routes Integration Tests', () => {
     });
   });
 
+  describe('GET /api/orders/by-store (Per-Account view)', () => {
+    it('should return an empty array when no orders exist', async () => {
+      const response = await request(app)
+        .get('/api/orders/by-store')
+        .expect(200);
+
+      expect(response.body).toEqual([]);
+    });
+
+    it('should aggregate stops per store account with drops and last visit', async () => {
+      const deliveredAt = new Date('2026-02-10T15:00:00Z');
+      await testPrisma.order.createMany({
+        data: [
+          {
+            customerName: 'QuickStop #1',
+            customerPhone: '+11111111111',
+            deliveryAddress: '123 Bedford Ave, Brooklyn, NY 11249',
+            status: OrderStatus.DELIVERED,
+            deliveredAt,
+          },
+          {
+            customerName: 'QuickStop #1',
+            customerPhone: '+11111111111',
+            deliveryAddress: '123 Bedford Ave, Brooklyn, NY 11249',
+            status: OrderStatus.PENDING,
+          },
+          {
+            customerName: 'Corner Market',
+            customerPhone: '+12222222222',
+            deliveryAddress: '456 Atlantic Ave, Brooklyn, NY 11217',
+            status: OrderStatus.ASSIGNED,
+          },
+        ],
+      });
+
+      const response = await request(app)
+        .get('/api/orders/by-store')
+        .expect(200);
+
+      expect(response.body).toHaveLength(2);
+
+      const quickStop = response.body.find(
+        (a: { storeAccount: string }) => a.storeAccount === 'QuickStop #1'
+      );
+      expect(quickStop).toBeDefined();
+      expect(quickStop.totalStops).toBe(2);
+      expect(quickStop.totalDrops).toBe(1);
+      expect(quickStop.lastVisit).toBe(deliveredAt.toISOString());
+      expect(quickStop.history).toHaveLength(2);
+
+      const cornerMarket = response.body.find(
+        (a: { storeAccount: string }) => a.storeAccount === 'Corner Market'
+      );
+      expect(cornerMarket.totalDrops).toBe(0);
+      expect(cornerMarket.lastVisit).toBeNull();
+
+      // The account with a recent visit sorts ahead of the never-visited one.
+      expect(response.body[0].storeAccount).toBe('QuickStop #1');
+    });
+  });
+
   describe('GET /api/orders/:id', () => {
     it('should return a specific order by ID', async () => {
       const order = await testPrisma.order.create({

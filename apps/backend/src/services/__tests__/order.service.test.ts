@@ -392,4 +392,139 @@ describe('OrderService', () => {
       });
     });
   });
+
+  describe('getOrdersByStore (Per-Account view aggregation)', () => {
+    // Helper to build a minimal order record as Prisma would return it.
+    const makeOrder = (overrides: Partial<any>): any => ({
+      id: 'order-id',
+      customerName: 'QuickStop #1',
+      customerPhone: '+1234567890',
+      deliveryAddress: '123 Main St, Brooklyn, NY 11201',
+      orderDetails: null,
+      status: OrderStatus.DELIVERED,
+      latitude: null,
+      longitude: null,
+      driverId: null,
+      createdAt: new Date('2026-01-01T10:00:00Z'),
+      assignedAt: null,
+      inTransitAt: null,
+      deliveredAt: null,
+      updatedAt: new Date('2026-01-01T10:00:00Z'),
+      ...overrides,
+    });
+
+    it('returns an empty array when there are no orders', async () => {
+      (mockPrisma.order.findMany as any).mockResolvedValue([]);
+
+      const result = await orderService.getOrdersByStore();
+
+      expect(mockPrisma.order.findMany).toHaveBeenCalled();
+      expect(result).toEqual([]);
+    });
+
+    it('aggregates one store account into total stops, total drops, and last visit', async () => {
+      const orders = [
+        makeOrder({
+          id: 'a1',
+          customerName: 'QuickStop #1',
+          deliveryAddress: '123 Main St, Brooklyn, NY 11201',
+          status: OrderStatus.DELIVERED,
+          createdAt: new Date('2026-01-01T10:00:00Z'),
+          deliveredAt: new Date('2026-01-01T12:00:00Z'),
+        }),
+        makeOrder({
+          id: 'a2',
+          customerName: 'QuickStop #1',
+          deliveryAddress: '123 Main St, Brooklyn, NY 11201',
+          status: OrderStatus.DELIVERED,
+          createdAt: new Date('2026-01-05T10:00:00Z'),
+          deliveredAt: new Date('2026-01-05T13:30:00Z'),
+        }),
+        makeOrder({
+          id: 'a3',
+          customerName: 'QuickStop #1',
+          deliveryAddress: '123 Main St, Brooklyn, NY 11201',
+          status: OrderStatus.PENDING,
+          createdAt: new Date('2026-01-10T10:00:00Z'),
+          deliveredAt: null,
+        }),
+      ];
+
+      (mockPrisma.order.findMany as any).mockResolvedValue(orders);
+
+      const result = await orderService.getOrdersByStore();
+
+      expect(result).toHaveLength(1);
+      const account = result[0];
+      expect(account.storeAccount).toBe('QuickStop #1');
+      expect(account.storeAddress).toBe('123 Main St, Brooklyn, NY 11201');
+      // All three stops count toward total stops; only delivered ones are drops.
+      expect(account.totalStops).toBe(3);
+      expect(account.totalDrops).toBe(2);
+      // Last visit is the most recent deliveredAt, serialized as ISO string.
+      expect(account.lastVisit).toBe(new Date('2026-01-05T13:30:00Z').toISOString());
+      // History contains every stop for the account, newest first.
+      expect(account.history).toHaveLength(3);
+      expect(account.history.map((h: any) => h.id)).toEqual(['a3', 'a2', 'a1']);
+    });
+
+    it('reports lastVisit as null when an account has no delivered stops', async () => {
+      const orders = [
+        makeOrder({
+          id: 'b1',
+          customerName: 'Corner Market',
+          status: OrderStatus.PENDING,
+          deliveredAt: null,
+        }),
+        makeOrder({
+          id: 'b2',
+          customerName: 'Corner Market',
+          status: OrderStatus.ASSIGNED,
+          deliveredAt: null,
+        }),
+      ];
+
+      (mockPrisma.order.findMany as any).mockResolvedValue(orders);
+
+      const result = await orderService.getOrdersByStore();
+
+      expect(result).toHaveLength(1);
+      expect(result[0].totalStops).toBe(2);
+      expect(result[0].totalDrops).toBe(0);
+      expect(result[0].lastVisit).toBeNull();
+    });
+
+    it('groups multiple store accounts and sorts them by most recent visit first', async () => {
+      const orders = [
+        makeOrder({
+          id: 'older',
+          customerName: 'Older Account',
+          status: OrderStatus.DELIVERED,
+          deliveredAt: new Date('2026-01-02T09:00:00Z'),
+        }),
+        makeOrder({
+          id: 'newer',
+          customerName: 'Newer Account',
+          status: OrderStatus.DELIVERED,
+          deliveredAt: new Date('2026-03-15T09:00:00Z'),
+        }),
+        makeOrder({
+          id: 'never',
+          customerName: 'Never Visited',
+          status: OrderStatus.PENDING,
+          deliveredAt: null,
+        }),
+      ];
+
+      (mockPrisma.order.findMany as any).mockResolvedValue(orders);
+
+      const result = await orderService.getOrdersByStore();
+
+      expect(result.map((a: any) => a.storeAccount)).toEqual([
+        'Newer Account',
+        'Older Account',
+        'Never Visited',
+      ]);
+    });
+  });
 });
