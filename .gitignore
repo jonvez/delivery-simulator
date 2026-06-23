@@ -9,6 +9,11 @@ coverage/
 test-results/
 playwright-report/
 playwright/.cache/
+.playwright-mcp/
+
+# Deploy / tooling caches
+.firebase/
+dsd-live-demo.png
 
 # Production
 dist/

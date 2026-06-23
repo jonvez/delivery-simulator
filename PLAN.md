@@ -49,8 +49,8 @@ Lifecycle is a clean sequence: **Scheduled → Assigned → En Route → Deliver
 - ✅ **#3 Per-Account view** merged (PR #13). `GET /api/orders/by-store` aggregation + `StoreHistory` component. No migration.
 - ✅ **#4 Planogram-compliance** merged (PR #14). Additive migration (`planogramReviewed`, `planogramNotes`) + `PATCH /api/orders/:id/planogram` + OrderCard badge/toggle/notes. TDD caught a `z.coerce.boolean()` silent-coercion bug.
 - ✅ **#5 README rewrite** merged (PR #15). DSD framing, built-solo, accurate stack/quickstart, "Live demo: coming soon". **LICENSE set to MIT** (was an unreviewed GPL-3.0 default — Jon ruled MIT, ADR 0007).
-- Branch tip `fd8f505`. Combined suite GREEN: backend 92, frontend 120, build clean. Local app verified at `:5173` with all features live.
-- ⏳ **#6 Deploy NEXT** — needs Jon's Railway + Vercel logins (the pause point). **#8 Pepper blurb** blocked on #6's public URL.
+- ✅ **#6 Deploy DONE (2026-06-23)** — **all-GCP, $0** (ADR 0008). Backend on a free-tier e2-micro VM (`dsd-demo`, us-east1-c): Postgres + Express + Caddy auto-TLS via Docker Compose → **https://api-35-237-118-208.sslip.io** (Let's Encrypt cert). Frontend on **Firebase Hosting** → **https://claude-code-mcp-486521.web.app** (the public link). Project `claude-code-mcp-486521`. Static IP 35.237.118.208. Pre-deploy hardening #18 merged (CORS lockdown + RUM env=production, security PASS). Live demo verified in-browser: API+DB connected, both features render, 0 console errors. Security gate PASS (IAP-only SSH, no public 5432, HTTPS both ends, CORS scoped, generated PG password).
+- ⏳ **#8 Pepper blurb** — now UNBLOCKED (have the live URL). Last roadmap item.
 
 ### Remaining roadmap
 
@@ -85,6 +85,14 @@ cd ../.. && npm run dev      # frontend :5173, backend :3001
 ---
 
 ## Session Log
+
+### 2026-06-23
+
+- **#6 Deploy shipped — the demo is LIVE: https://claude-code-mcp-486521.web.app** (backend https://api-35-237-118-208.sslip.io). All-GCP, $0 target (ADR 0008): free-tier e2-micro VM (Postgres+Express+Caddy via Docker Compose) + Firebase Hosting. First time this project has ever been deployed.
+- Pre-deploy: merged #18 (CORS lockdown + RUM env, security PASS); filed #16 (Customer Phone relabel) + #17 (ESLint lint failure — fix before sharing widely). Architect ADR 0008 + GCP runbook.
+- Deploy notes/gotchas hit + solved: us-east1-b e2-micro capacity-exhausted → used us-east1-c; corrected runbook's `DATABASE_URL` (`@postgres` service name, not localhost); added 2 GB swap (969 MB RAM); **deleting project-wide `default-allow-ssh`/`default-allow-rdp` required cross-project coordination** (rig + dinner-and-groceries cleared it via the process bus) — SSH now IAP-only project-wide; **`firebase addFirebase` 403 was the account not having accepted Firebase ToS** — resolved once Jon created a Firebase project in the console, then `addfirebase` to the existing GCP project worked. Fixed page `<title>` (was default 'frontend').
+- Security gate PASS; live demo verified in-browser (API+DB connected, features render, 0 console errors).
+- Remaining: **#8 Pepper framing blurb** (now unblocked — have the live link).
 
 ### 2026-06-22
 
