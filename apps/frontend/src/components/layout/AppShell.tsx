@@ -1,28 +1,67 @@
 import { Outlet } from 'react-router-dom';
 import { RoleSwitcher } from '@/components/layout/RoleSwitcher';
+import { SystemMenu } from '@/components/layout/SystemMenu';
+import { ImpersonationBanner } from '@/components/layout/ImpersonationBanner';
+import { useHealthCheck } from '@/hooks/useHealthCheck';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 /**
- * AppShell — persistent chrome shared by every role view. Header carries the product title
- * and the role switcher; the active view renders through <Outlet/>. The system menu,
- * impersonation banner, and connection status move in during the chrome-demotion step.
+ * AppShell — persistent chrome shared by every role view: title + a compact health dot, the
+ * role switcher, the demoted system menu, and the "acting as…" banner. The active view renders
+ * through <Outlet/>; if the backend is unreachable, a single error card replaces it.
  */
 export function AppShell() {
+  const { data, error, refetch } = useHealthCheck();
+  const connected = !!data && !error;
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <header className="border-b bg-card">
         <div className="max-w-[1800px] mx-auto px-8 py-5 flex items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">DSD Route Manager</h1>
-            <p className="text-sm text-muted-foreground">
-              Direct Store Delivery for convenience-store distribution
-            </p>
+          <div className="flex items-center gap-3">
+            <span
+              className={cn(
+                'h-2.5 w-2.5 rounded-full shrink-0',
+                connected ? 'bg-green-500' : error ? 'bg-red-500' : 'bg-muted-foreground'
+              )}
+              title={connected ? 'Connected' : error ? 'Disconnected' : 'Checking…'}
+              aria-label={connected ? 'Backend connected' : error ? 'Backend disconnected' : 'Checking connection'}
+            />
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">DSD Route Manager</h1>
+              <p className="text-sm text-muted-foreground">
+                Direct Store Delivery for convenience-store distribution
+              </p>
+            </div>
           </div>
-          <RoleSwitcher />
+          <div className="flex items-center gap-3">
+            <RoleSwitcher />
+            <SystemMenu />
+          </div>
+        </div>
+        <div className="max-w-[1800px] mx-auto px-8 pb-3">
+          <ImpersonationBanner />
         </div>
       </header>
 
-      <main className="max-w-[1800px] mx-auto p-8">
-        <Outlet />
+      <main className="max-w-[1800px] mx-auto p-8 w-full flex-1">
+        {error ? (
+          <Card className="border-destructive">
+            <CardContent className="py-6 space-y-4">
+              <p className="text-sm font-semibold text-destructive">Unable to connect to the backend</p>
+              <p className="text-sm text-muted-foreground">
+                {error} — make sure the backend server is running on port 3001.
+              </p>
+              <Button onClick={refetch} variant="outline" size="sm">
+                Retry connection
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <Outlet />
+        )}
       </main>
 
       <footer className="border-t mt-8">

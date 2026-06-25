@@ -3,12 +3,10 @@ import { AppShell } from '@/components/layout/AppShell';
 import { DispatcherView } from '@/views/DispatcherView';
 import { RepView } from '@/views/RepView';
 import { AccountManagerView } from '@/views/AccountManagerView';
-import { DashboardLegacy } from '@/components/DashboardLegacy';
 
 /**
- * App — route table. A single AppShell layout route wraps the three role views; the URL is
- * the active role. `/legacy` temporarily preserves the original single screen for reference
- * during the reorg and is removed once the role views own every widget.
+ * App — route table. A single AppShell layout route wraps the three role views; the URL is the
+ * active role (and, for the rep view, the impersonated rep via /route/:repId).
  */
 function App() {
   return (
@@ -21,7 +19,6 @@ function App() {
         <Route path="/accounts" element={<AccountManagerView />} />
         <Route path="*" element={<Navigate to="/dispatch" replace />} />
       </Route>
-      <Route path="/legacy" element={<DashboardLegacy />} />
     </Routes>
   );
 }
