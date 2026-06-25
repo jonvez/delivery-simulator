@@ -97,7 +97,7 @@ export function Map({
     : [];
 
   return (
-    <Card className={`overflow-hidden ${className}`}>
+    <Card className={`overflow-hidden ${className}`} data-testid="map-container">
       <MapContainer
         center={center}
         zoom={zoom}

@@ -29,11 +29,11 @@ function DriverCard({ driver, isExpanded, onToggleExpansion, onToggleAvailabilit
   );
 
   return (
-    <Card className="p-4">
+    <Card className="p-4" data-testid="driver-item">
       <div className="flex items-center justify-between gap-4">
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <h4 className="font-medium">{driver.name}</h4>
+            <h4 className="font-medium" data-testid="driver-name">{driver.name}</h4>
             {activeOrders.length > 0 && (
               <Badge variant="outline" className="text-xs">
                 {activeOrders.length} active stop{activeOrders.length !== 1 ? 's' : ''}
