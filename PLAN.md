@@ -47,8 +47,15 @@ Lifecycle is a clean sequence: **Scheduled → Assigned → En Route → Deliver
 New initiative (post-deploy): the demo is one busy screen (App.tsx renders 9 sections at once). Reorganizing through a **jobs-to-be-done lens** into **3 role-based views** behind a top-right "acting as…" role switcher, so a Pepper reviewer reads DSD as a hand-off chain (back-office ↔ field), not one job. Approved plan (Jon, 2026-06-25): `~/.claude/plans/wiggly-inventing-wall.md`.
 
 - **Decisions:** multiple distinct roles (Dispatcher / Route Sales Rep / Account Manager); **add `react-router-dom`** (real routes `/dispatch`, `/route/:repId`, `/accounts` — security review PASS/LOW, pinned 7.18.0); **actionable Rep view** (Start/Mark Delivered wired to existing `PATCH /api/orders/:id`); **state-responsive Dispatcher** (Plan when unassigned, Monitor once rolling, Re-plan affordance); roster CRUD + data-reset/health demoted to Dispatcher + a header overflow menu. No React context — router params + per-hook refetch suffice. Frontend-only; backend API unchanged; every existing widget reused.
-- **Mode:** auto. Tracked as GitHub board issues (one per build-sequence step 1–7).
+- **Mode:** auto. Tracked as GitHub board issues #19–#25 (one per build-sequence step 1–7).
 - **IA:** `/dispatch` (Plan & Assign ↔ Monitor Routes via `?mode`) · `/route/:repId?` (my route; pick-a-rep empty state) · `/accounts` (at-risk summary + StoreHistory) · `/`→`/dispatch`.
+
+**Progress (2026-06-25):** Steps 1–6 DONE + browser-verified (#19–#24). Step 7 (#25) partial:
+- ✅ 25 unit tests added → **full suite 145 green**; `npm run build` clean.
+- ✅ data-testids added (driver-item, driver-name, map-container); both Playwright specs rewritten for the new role views.
+- ⏳ **e2e not yet run to green** — the playwright run stalled (likely webServer/reporter handshake; dev server was already up). **NEXT SESSION:** run e2e (`cd apps/frontend && npx playwright test`, investigate the stall — maybe `--reporter=line` and confirm reuseExistingServer), fix any spec issues, then move #25 → Done.
+- Bonus fix shipped: **theme tokens wrapped in `hsl()`** — every `bg-primary`/`bg-destructive` was rendering transparent app-wide (primary buttons had no fill); now fixed.
+- All work committed on `dsd-convenience-store-demo` (not yet pushed). Local dev env was running (Postgres + `npm run dev`).
 
 ### Status (2026-06-22)
 
