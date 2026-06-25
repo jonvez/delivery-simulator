@@ -11,15 +11,26 @@ import { OrderStatus } from '@/types/order';
  * Component for displaying a rep's assigned stops on a map
  * Story 4.3: Display Rep's Assigned Stops on Map
  */
-export function DriverMapView() {
-  const [selectedDriverId, setSelectedDriverId] = useState<string>('');
+/**
+ * DriverMapView — a rep's active stops on the map. When `driverId` is supplied (e.g. the rep
+ * view drives it from the URL) the internal rep picker is hidden and that rep is used.
+ */
+export function DriverMapView({ driverId }: { driverId?: string } = {}) {
+  const [internalDriverId, setInternalDriverId] = useState<string>('');
+  const controlled = driverId !== undefined;
+  const selectedDriverId = controlled ? driverId : internalDriverId;
+  const setSelectedDriverId = setInternalDriverId;
   const { drivers, loading: driversLoading } = useDrivers();
   const { orders, loading: ordersLoading } = useDriverOrders(selectedDriverId || null);
 
-  // Filter only active orders (ASSIGNED and IN_TRANSIT)
-  const activeOrders = orders.filter(
-    (order) => order.status === OrderStatus.ASSIGNED || order.status === OrderStatus.IN_TRANSIT
-  );
+  // Active stops (ASSIGNED and IN_TRANSIT), ordered by creation so the map sequence matches
+  // the rep's stop list (createdAt ascending is the proxy for route order).
+  const activeOrders = orders
+    .filter(
+      (order) => order.status === OrderStatus.ASSIGNED || order.status === OrderStatus.IN_TRANSIT
+    )
+    .slice()
+    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
   // Convert orders to map markers with sequence numbers
   // Story 4.4: Add sequence numbers for route visualization
@@ -42,28 +53,30 @@ export function DriverMapView() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Driver Selection */}
-        <div className="flex items-center gap-4">
-          <label htmlFor="driver-select" className="text-sm font-medium whitespace-nowrap">
-            Select Rep:
-          </label>
-          <Select
-            value={selectedDriverId}
-            onValueChange={setSelectedDriverId}
-            disabled={driversLoading}
-          >
-            <SelectTrigger id="driver-select" className="w-full">
-              <SelectValue placeholder="Choose a rep..." />
-            </SelectTrigger>
-            <SelectContent>
-              {drivers.map((driver) => (
-                <SelectItem key={driver.id} value={driver.id}>
-                  {driver.name} {driver.isAvailable ? '(On Route)' : '(Off Route)'}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Driver Selection — hidden when a parent controls the selected rep (e.g. rep view) */}
+        {!controlled && (
+          <div className="flex items-center gap-4">
+            <label htmlFor="driver-select" className="text-sm font-medium whitespace-nowrap">
+              Select Rep:
+            </label>
+            <Select
+              value={selectedDriverId}
+              onValueChange={setSelectedDriverId}
+              disabled={driversLoading}
+            >
+              <SelectTrigger id="driver-select" className="w-full">
+                <SelectValue placeholder="Choose a rep..." />
+              </SelectTrigger>
+              <SelectContent>
+                {drivers.map((driver) => (
+                  <SelectItem key={driver.id} value={driver.id}>
+                    {driver.name} {driver.isAvailable ? '(On Route)' : '(Off Route)'}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
         {/* Loading State */}
         {ordersLoading && (
