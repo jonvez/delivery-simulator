@@ -38,7 +38,18 @@ const statusSections = [
   },
 ];
 
-export function OrderList() {
+interface OrderListProps {
+  /** Limit the rendered status sections (default: all four). */
+  statuses?: OrderStatus[];
+  /** Hide the built-in "Stops" header + total, when a parent supplies its own heading. */
+  hideHeader?: boolean;
+  /** Notify a parent after a mutation here (assign / planogram) so it can refresh sibling data. */
+  onChanged?: () => void;
+}
+
+const ALL_STATUSES: OrderStatus[] = statusSections.map((s) => s.status);
+
+export function OrderList({ statuses = ALL_STATUSES, hideHeader = false, onChanged }: OrderListProps = {}) {
   const { orders, loading, error, refetch } = useOrders();
   const { drivers } = useDrivers();
   const { assignOrder, loading: assigning } = useAssignOrder();
@@ -49,6 +60,7 @@ export function OrderList() {
     if (result) {
       // Refresh orders to show updated assignment
       refetch();
+      onChanged?.();
     }
   };
 
@@ -57,6 +69,7 @@ export function OrderList() {
     if (result) {
       // Refresh so the saved review reflects on reload
       refetch();
+      onChanged?.();
     }
   };
 
@@ -121,21 +134,33 @@ export function OrderList() {
     );
   }
 
+  const visibleSections = statusSections.filter(({ status }) => statuses.includes(status));
+  const visibleCount = visibleSections.reduce(
+    (total, { status }) => total + groupedOrders[status].length,
+    0
+  );
+
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Stops</h2>
-          <p className="text-muted-foreground">
-            Total: {orders.length} stop{orders.length !== 1 ? 's' : ''}
-          </p>
+      {!hideHeader && (
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold">Stops</h2>
+            <p className="text-muted-foreground">
+              Total: {orders.length} stop{orders.length !== 1 ? 's' : ''}
+            </p>
+          </div>
+          <Button onClick={refetch} variant="outline" size="sm">
+            Refresh
+          </Button>
         </div>
-        <Button onClick={refetch} variant="outline" size="sm">
-          Refresh
-        </Button>
-      </div>
+      )}
 
-      {statusSections.map(({ status, title, description }) => {
+      {visibleCount === 0 && (
+        <p className="text-sm text-muted-foreground">No stops in this view right now.</p>
+      )}
+
+      {visibleSections.map(({ status, title, description }) => {
         const statusOrders = groupedOrders[status];
 
         if (statusOrders.length === 0) {

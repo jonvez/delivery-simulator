@@ -15,7 +15,12 @@ interface FormErrors {
   orderDetails?: string;
 }
 
-export function OrderForm() {
+interface OrderFormProps {
+  /** Called after a stop is successfully created, so a parent can refresh / close the form. */
+  onCreated?: () => void;
+}
+
+export function OrderForm({ onCreated }: OrderFormProps = {}) {
   const { createOrder, loading, error, success, resetState } = useCreateOrder();
   const [formData, setFormData] = useState<CreateOrderInput>({
     customerName: '',
@@ -88,6 +93,7 @@ export function OrderForm() {
         orderDetails: '',
       });
       setFormErrors({});
+      onCreated?.();
     }
   };
 
