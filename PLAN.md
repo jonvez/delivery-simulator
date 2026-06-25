@@ -42,6 +42,14 @@ Lifecycle is a clean sequence: **Scheduled → Assigned → En Route → Deliver
 
 ## Active Context
 
+### Status (2026-06-25) — UX reorg into role-based views (ACTIVE)
+
+New initiative (post-deploy): the demo is one busy screen (App.tsx renders 9 sections at once). Reorganizing through a **jobs-to-be-done lens** into **3 role-based views** behind a top-right "acting as…" role switcher, so a Pepper reviewer reads DSD as a hand-off chain (back-office ↔ field), not one job. Approved plan (Jon, 2026-06-25): `~/.claude/plans/wiggly-inventing-wall.md`.
+
+- **Decisions:** multiple distinct roles (Dispatcher / Route Sales Rep / Account Manager); **add `react-router-dom`** (real routes `/dispatch`, `/route/:repId`, `/accounts` — security review PASS/LOW, pinned 7.18.0); **actionable Rep view** (Start/Mark Delivered wired to existing `PATCH /api/orders/:id`); **state-responsive Dispatcher** (Plan when unassigned, Monitor once rolling, Re-plan affordance); roster CRUD + data-reset/health demoted to Dispatcher + a header overflow menu. No React context — router params + per-hook refetch suffice. Frontend-only; backend API unchanged; every existing widget reused.
+- **Mode:** auto. Tracked as GitHub board issues (one per build-sequence step 1–7).
+- **IA:** `/dispatch` (Plan & Assign ↔ Monitor Routes via `?mode`) · `/route/:repId?` (my route; pick-a-rep empty state) · `/accounts` (at-risk summary + StoreHistory) · `/`→`/dispatch`.
+
 ### Status (2026-06-22)
 
 - ✅ **Adoption gate cleared** (Jon said "start" — ADR 0005). Build team executed the roadmap via the GitHub Projects board + persona subagents (PO / Dev×2 / QA / non-author security gate), full TDD pipeline.
