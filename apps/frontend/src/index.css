@@ -6,8 +6,10 @@
      transparent, which silently broke every bg-primary/bg-destructive across the app). */
   --color-background: hsl(0 0% 100%);
   --color-foreground: hsl(222.2 84% 4.9%);
-  --color-primary: hsl(222.2 47.4% 11.2%);
-  --color-primary-foreground: hsl(210 40% 98%);
+  /* Primary = Pepper brand emerald (#00935e, sampled from usepepper.com). The DSD demo is
+     the live-demo artifact for Jon's Pepper application, so the accent echoes their brand. */
+  --color-primary: hsl(158 100% 29%);
+  --color-primary-foreground: hsl(0 0% 100%);
   --color-secondary: hsl(210 40% 96.1%);
   --color-secondary-foreground: hsl(222.2 47.4% 11.2%);
   --color-muted: hsl(210 40% 96.1%);
@@ -18,11 +20,24 @@
   --color-destructive-foreground: hsl(210 40% 98%);
   --color-border: hsl(214.3 31.8% 91.4%);
   --color-input: hsl(214.3 31.8% 91.4%);
-  --color-ring: hsl(222.2 84% 4.9%);
+  --color-ring: hsl(158 100% 29%);
   --color-card: hsl(0 0% 100%);
   --color-card-foreground: hsl(222.2 84% 4.9%);
   --color-popover: hsl(0 0% 100%);
   --color-popover-foreground: hsl(222.2 84% 4.9%);
+
+  /* Stop-lifecycle status colors — each hue traces to Pepper's own palette
+     (cyan #24c0fd, amber #f79009, emerald #00935e), with a slate for "not yet started".
+     Solid tokens drive status badges; *-soft tints back the dispatcher count tiles. */
+  --color-status-scheduled: hsl(215 16% 47%);
+  --color-status-assigned: hsl(197 98% 57%);
+  --color-status-enroute: hsl(34 94% 50%);
+  --color-status-delivered: hsl(158 100% 29%);
+  --color-status-scheduled-soft: hsl(215 20% 94%);
+  --color-status-assigned-soft: hsl(197 90% 94%);
+  --color-status-enroute-soft: hsl(34 95% 93%);
+  --color-status-delivered-soft: hsl(158 55% 93%);
+
   --radius: 0.5rem;
 }
 

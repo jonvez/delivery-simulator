@@ -14,6 +14,12 @@ const badgeVariants = cva(
         destructive:
           'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80',
         outline: 'text-foreground',
+        // Stop-lifecycle status variants — light hues (assigned/enroute) take dark text,
+        // dark hues (scheduled/delivered) take white, all for legible contrast.
+        scheduled: 'border-transparent bg-status-scheduled text-white',
+        assigned: 'border-transparent bg-status-assigned text-foreground',
+        enroute: 'border-transparent bg-status-enroute text-foreground',
+        delivered: 'border-transparent bg-status-delivered text-white',
       },
     },
     defaultVariants: {

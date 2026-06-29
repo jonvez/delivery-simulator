@@ -20,11 +20,11 @@ interface OrderCardProps {
   reviewingPlanogram?: boolean;
 }
 
-const statusColors: Record<OrderStatus, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-  [OrderStatus.PENDING]: 'outline',
-  [OrderStatus.ASSIGNED]: 'secondary',
-  [OrderStatus.IN_TRANSIT]: 'default',
-  [OrderStatus.DELIVERED]: 'default',
+const statusColors: Record<OrderStatus, 'scheduled' | 'assigned' | 'enroute' | 'delivered'> = {
+  [OrderStatus.PENDING]: 'scheduled',
+  [OrderStatus.ASSIGNED]: 'assigned',
+  [OrderStatus.IN_TRANSIT]: 'enroute',
+  [OrderStatus.DELIVERED]: 'delivered',
 };
 
 const statusLabels: Record<OrderStatus, string> = {
