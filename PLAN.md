@@ -11,7 +11,7 @@ Reframe the restaurant **Delivery Manager** into a **Direct Store Delivery (DSD)
 - **Branch-based** (Jon, 2026-06-18): restaurant version stays on `main`; DSD demo is branch `dsd-convenience-store-demo` (pushed to origin / GitHub jonvez/delivery-simulator).
 - **~90% relabel, no destructive schema changes.** The Prisma model (Order / Driver / Assignment) is domain-agnostic. Columns `customerName` / `orderDetails` keep their names but carry **store-account / case-list** meaning. Only the planogram feature adds a migration.
 - **Stack stays** Node/Express + React. Pepper *prefers* Python backend (preference, not requirement; React matches) — speak to it, don't rewrite.
-- **Deploy:** Railway (backend + Postgres) + Vercel (frontend). Guided click-by-click for Jon's logins. A working public link is the #1 application requirement.
+- **Deploy (LIVE, all-GCP, $0 — ADR 0008):** backend on a free-tier e2-micro VM (Postgres + Express + Caddy auto-TLS via Docker Compose) → `https://api-35-237-118-208.sslip.io`; frontend on **Firebase Hosting** → **`https://claude-code-mcp-486521.web.app`** (the public link — the #1 application requirement). GCP project `claude-code-mcp-486521`. (Superseded the original Railway+Vercel plan.) Runbook: `docs/` + ADR 0008.
 
 ### DSD vocabulary (display labels only — code/DB identifiers unchanged)
 
@@ -33,50 +33,50 @@ Rationale: pick the **rep + route** frame once; every noun + status verb derives
 | Rep availability Available/Unavailable | **On Route / Off Route** | confirmed (Jon 2026-06-19) |
 | Order ID | **Stop ID** | confirmed (Jon 2026-06-19 — was "Delivery ID"; changed for coherence with Stop) |
 
-Lifecycle is a clean sequence: **Scheduled → Assigned → En Route → Delivered** (a Stop ends "Delivered"). DB enum values (PENDING/ASSIGNED/IN_TRANSIT/DELIVERED) stay; only display labels change. **All vocabulary now confirmed (Jon 2026-06-19)** — safe to propagate to frontend + tests.
+Lifecycle is a clean sequence: **Scheduled → Assigned → En Route → Delivered** (a Stop ends "Delivered"). DB enum values (PENDING/ASSIGNED/IN_TRANSIT/DELIVERED) stay; only display labels change.
 
 ### Signature features (BOTH, per Jon 2026-06-18)
 
 1. **Per-Account view** — per-store delivery history, total drops, last visit (the DSD account-management lens). No migration; aggregates existing data. Backend: aggregation in `order.service.ts` + `GET /api/orders/by-store`; frontend: new `StoreHistory` component.
-2. **Planogram-compliance check** — rep marks "planogram reviewed" + notes per stop. **Adds a small migration** (e.g., `Order.planogramReviewed Boolean`, `Order.planogramNotes String?`). Surface a badge/toggle in `OrderCard`.
+2. **Planogram-compliance check** — rep marks "planogram reviewed" + notes per stop. **Adds a small migration** (`Order.planogramReviewed Boolean`, `Order.planogramNotes String?`). Surfaced as a badge/toggle in `OrderCard`.
+
+### Role-based IA — UX reorg (Jon, 2026-06-25)
+
+The demo is reorganized through a **jobs-to-be-done lens** into **3 role-based views** behind a
+top-right "acting as…" role switcher, so a Pepper reviewer reads DSD as a back-office ↔ field
+hand-off chain, not one busy screen. Uses `react-router-dom` (pinned 7.18.0). IA:
+- `/dispatch` — Plan & Assign ↔ Monitor Routes (via `?mode`); state-responsive (Plan while unassigned, Monitor once rolling, Re-plan affordance).
+- `/route/:repId?` — the rep's actionable route (Start / Mark Delivered wired to `PATCH /api/orders/:id`); pick-a-rep empty state.
+- `/accounts` — at-risk summary + `StoreHistory`. · `/` → `/dispatch`.
+
+Frontend-only; backend API unchanged; every existing widget reused (no React context — router
+params + per-hook refetch). Roster CRUD + data-reset/health demoted to Dispatcher + a header
+overflow menu. Approved plan: `~/.claude/plans/wiggly-inventing-wall.md`.
+
+### Visual identity + guided onboarding (Jon, 2026-06-29)
+
+- **Color theme, not a design system.** Considered a full design system; chose to just adopt a
+  **brand color theme**. The accent **echoes Pepper's real brand** (emerald `#00935e` →
+  `hsl(158 100% 29%)`, sampled from usepepper.com's stylesheet — their logo is a *bell* pepper, so
+  the brand is green, not red) so the demo reads as built *for* them. Tokens live in
+  `apps/frontend/src/index.css` `@theme`: `--color-primary` + a Pepper-derived **Stop-lifecycle
+  status ramp** (`--color-status-{scheduled|assigned|enroute|delivered}` = slate / cyan `#24c0fd` /
+  amber `#f79009` / emerald), surfaced via Badge `scheduled|assigned|enroute|delivered` variants and
+  the dispatcher count-tile tints.
+- **Guided navigation = a spotlight tour.** Of the options floated, chose a **driver.js** coachmark
+  tour (pinned **1.6.0**, security-reviewed → Accept-with-hardening / LOW, logged in
+  `~/.claude/third-party-inventory.md`). Auto-offered once per browser (localStorage gate) and
+  relaunchable from the header "Tour" button; it threads the rep→route hand-off **across the three
+  role views** (`/dispatch` → `/route` → `/accounts`), navigating the router between steps. Lives in
+  `apps/frontend/src/components/tour/` with `data-tour="…"` anchors on the role switcher + each view.
 
 ## Active Context
 
-### Status (2026-06-25) — UX reorg into role-based views (ACTIVE)
+> **Live work status → GitHub Projects board #2** — `ghpm list` (github.com/users/jonvez/projects/2).
+> Status is the board's job and is **not mirrored here** (per build-team convention `evt-0002`).
+> History → git log, ADRs (`docs/decisions/`), retro (`docs/retro/log.md`), and `PLAN.archive.2026-06-29.md`.
 
-New initiative (post-deploy): the demo is one busy screen (App.tsx renders 9 sections at once). Reorganizing through a **jobs-to-be-done lens** into **3 role-based views** behind a top-right "acting as…" role switcher, so a Pepper reviewer reads DSD as a hand-off chain (back-office ↔ field), not one job. Approved plan (Jon, 2026-06-25): `~/.claude/plans/wiggly-inventing-wall.md`.
-
-- **Decisions:** multiple distinct roles (Dispatcher / Route Sales Rep / Account Manager); **add `react-router-dom`** (real routes `/dispatch`, `/route/:repId`, `/accounts` — security review PASS/LOW, pinned 7.18.0); **actionable Rep view** (Start/Mark Delivered wired to existing `PATCH /api/orders/:id`); **state-responsive Dispatcher** (Plan when unassigned, Monitor once rolling, Re-plan affordance); roster CRUD + data-reset/health demoted to Dispatcher + a header overflow menu. No React context — router params + per-hook refetch suffice. Frontend-only; backend API unchanged; every existing widget reused.
-- **Mode:** auto. Tracked as GitHub board issues #19–#25 (one per build-sequence step 1–7).
-- **IA:** `/dispatch` (Plan & Assign ↔ Monitor Routes via `?mode`) · `/route/:repId?` (my route; pick-a-rep empty state) · `/accounts` (at-risk summary + StoreHistory) · `/`→`/dispatch`.
-
-**Progress (2026-06-25):** Steps 1–6 DONE + browser-verified (#19–#24). Step 7 (#25) partial:
-- ✅ 25 unit tests added → **full suite 145 green**; `npm run build` clean.
-- ✅ data-testids added (driver-item, driver-name, map-container); both Playwright specs rewritten for the new role views.
-- ⏳ **e2e not yet run to green** — the playwright run stalled (likely webServer/reporter handshake; dev server was already up). **NEXT SESSION:** run e2e (`cd apps/frontend && npx playwright test`, investigate the stall — maybe `--reporter=line` and confirm reuseExistingServer), fix any spec issues, then move #25 → Done.
-- Bonus fix shipped: **theme tokens wrapped in `hsl()`** — every `bg-primary`/`bg-destructive` was rendering transparent app-wide (primary buttons had no fill); now fixed.
-- All work committed on `dsd-convenience-store-demo` (not yet pushed). Local dev env was running (Postgres + `npm run dev`).
-
-### Status (2026-06-22)
-
-- ✅ **Adoption gate cleared** (Jon said "start" — ADR 0005). Build team executed the roadmap via the GitHub Projects board + persona subagents (PO / Dev×2 / QA / non-author security gate), full TDD pipeline.
-- ✅ **#2 Frontend reframe** merged (PR #9). Full DSD vocabulary + "About this demo" blurb. QA caught 3 sub-defects (#10/#11/#12 — leftover strings, self-masking tests, hook error fallbacks); all fixed. PO scope ruling ADR 0006 (scope reframe issues by outcome + repo-wide grep, not file lists).
-- ✅ **#3 Per-Account view** merged (PR #13). `GET /api/orders/by-store` aggregation + `StoreHistory` component. No migration.
-- ✅ **#4 Planogram-compliance** merged (PR #14). Additive migration (`planogramReviewed`, `planogramNotes`) + `PATCH /api/orders/:id/planogram` + OrderCard badge/toggle/notes. TDD caught a `z.coerce.boolean()` silent-coercion bug.
-- ✅ **#5 README rewrite** merged (PR #15). DSD framing, built-solo, accurate stack/quickstart, "Live demo: coming soon". **LICENSE set to MIT** (was an unreviewed GPL-3.0 default — Jon ruled MIT, ADR 0007).
-- ✅ **#6 Deploy DONE (2026-06-23)** — **all-GCP, $0** (ADR 0008). Backend on a free-tier e2-micro VM (`dsd-demo`, us-east1-c): Postgres + Express + Caddy auto-TLS via Docker Compose → **https://api-35-237-118-208.sslip.io** (Let's Encrypt cert). Frontend on **Firebase Hosting** → **https://claude-code-mcp-486521.web.app** (the public link). Project `claude-code-mcp-486521`. Static IP 35.237.118.208. Pre-deploy hardening #18 merged (CORS lockdown + RUM env=production, security PASS). Live demo verified in-browser: API+DB connected, both features render, 0 console errors. Security gate PASS (IAP-only SSH, no public 5432, HTTPS both ends, CORS scoped, generated PG password).
-- ⏳ **#8 Pepper blurb** — now UNBLOCKED (have the live URL). Last roadmap item.
-
-### Remaining roadmap
-
-1. **#6 Deploy** (board: Ready) — **Railway** (backend + Postgres) + **Vercel** (frontend); guided click-by-click for Jon's logins. Produces the public link — the **#1 application requirement**. Docs: `docs/DEPLOYMENT_GUIDE.md`. NOTE: this project has **never been deployed** — no legacy prod URL exists (verified across docs/git/MemPalace 2026-06-22). The DSD demo's Vercel URL will be its own separate prod env (not shared with `main`).
-2. **#8 Pepper framing blurb** (board: Backlog, blocked on #6) — short "what this is / why it maps to DSD / built solo with AI" note + live link + repo link, for the job-search Pepper application (CRM row 73).
-
-### Polish backlog (tracked locally; non-blocking — file as issues w/ Jon's OK)
-
-- **OrderForm "Customer Phone" → Store/Contact Phone** — carve-out from #2 (ADR 0006 acceptance). Display-only relabel + test update.
-- **ESLint version mismatch** — root `eslint` 8.57 vs frontend `^9.39` → `npm run lint` fails repo-wide (`ERR_PACKAGE_PATH_NOT_EXPORTED`); `tsc` typecheck is clean. **Fix before the public demo** (a reviewer running the documented `npm run lint` hits an error).
-- **~70 Dependabot vulns** (3 critical) — flagged for later cleanup; not blocking the demo.
+This section holds only context the board can't: env setup, known gotchas, and process.
 
 ### Local dev quickstart (verified working 2026-06-18)
 
@@ -89,48 +89,14 @@ cd ../.. && npm run dev      # frontend :5173, backend :3001
 # verify: npm run build  +  (cd apps/backend && npm test)  +  (CI=true npm test --workspace=apps/frontend)
 ```
 
-### Notes / Blockers
+### Known issues / gotchas (not board-tracked)
 
-- GitHub flagged ~70 Dependabot vulns on the repo (3 critical) — not blocking the demo; flag for later cleanup.
-- RUM `clientToken` in `index.html` is public-by-design (not a secret); `DD_API_KEY` stays in gitignored `.env`.
-- ✅ Vocabulary fully resolved (Jon 2026-06-19): Stop/Stops · Case List · On Route/Off Route · Stop ID. No OPEN items remain — frontend reframe can proceed from the settled table.
-- Cross-project: this demo is the artifact for the Pepper application tracked in job-search CRM (Opportunities row 73).
-- **Process migrated off BMAD → native team paradigm** (shared with `dinner-and-groceries`): see `TEAM.md`, `SPEC.md`, `docs/decisions/` (ADRs 0001–0003), `docs/retro/log.md`. The remaining DSD roadmap below is being filed as GitHub Project issues. Adoption Gate: team grooms/designs until Jon says **"start."**
+- **`docker compose up` gotcha:** start Postgres only (`-d postgres`); a bare `up` starts the `datadog-agent` service, which needs `DD_API_KEY` and fails without it.
+- **RUM `clientToken`** in `index.html` is public-by-design (not a secret); `DD_API_KEY` stays in the gitignored `.env`.
+- **~70 Dependabot vulns** (3 critical) — surfaced by GitHub Dependabot; flagged for later cleanup, not blocking the demo.
+- **`main` branch** = the restaurant Delivery Manager + Datadog observability instrumentation (APM/logs/Postgres/RUM), committed at `50d8cd4`. This branch intentionally diverges; both are kept side by side.
 
----
+### Process & cross-project
 
-## Session Log
-
-### 2026-06-23
-
-- **#6 Deploy shipped — the demo is LIVE: https://claude-code-mcp-486521.web.app** (backend https://api-35-237-118-208.sslip.io). All-GCP, $0 target (ADR 0008): free-tier e2-micro VM (Postgres+Express+Caddy via Docker Compose) + Firebase Hosting. First time this project has ever been deployed.
-- Pre-deploy: merged #18 (CORS lockdown + RUM env, security PASS); filed #16 (Customer Phone relabel) + #17 (ESLint lint failure — fix before sharing widely). Architect ADR 0008 + GCP runbook.
-- Deploy notes/gotchas hit + solved: us-east1-b e2-micro capacity-exhausted → used us-east1-c; corrected runbook's `DATABASE_URL` (`@postgres` service name, not localhost); added 2 GB swap (969 MB RAM); **deleting project-wide `default-allow-ssh`/`default-allow-rdp` required cross-project coordination** (rig + dinner-and-groceries cleared it via the process bus) — SSH now IAP-only project-wide; **`firebase addFirebase` 403 was the account not having accepted Firebase ToS** — resolved once Jon created a Firebase project in the console, then `addfirebase` to the existing GCP project worked. Fixed page `<title>` (was default 'frontend').
-- Security gate PASS; live demo verified in-browser (API+DB connected, features render, 0 console errors).
-- Remaining: **#8 Pepper framing blurb** (now unblocked — have the live link).
-
-### 2026-06-22
-
-- **Said "start"** — adoption gate cleared (ADR 0005); closed stale vocab issue #7. Orchestrated the build team through the board.
-- Shipped **4 of 6 roadmap issues** end-to-end (groom → TDD dev in worktrees → QA → non-author security → PO accept → merge): **#2** frontend reframe, **#3** Per-Account view, **#4** Planogram-compliance, **#5** README + MIT license. Combined suite green (backend 92, frontend 120, build clean).
-- QA earned its keep: caught self-masking tests + leftover strings on #2 (#10/#11/#12), and the **GPL-3.0-vs-MIT license contradiction** on #5 (→ Jon ruled MIT, ADR 0007). ADR 0006 = scope reframe issues by outcome + grep.
-- **Process lesson (saved to MemPalace `rig/feedback`):** the auto-mode **classifier** (intent: "did the user request this write?") is a separate layer from the permission **allowlist** (command shape). Can't allowlist/token past an "unrequested" judgment. Invoke `gh issue create/close` as plain single commands (no pipes/compound) and route creates through explicit user OK. No GitHub App/scoped-token mechanism exists for this — skip that hunt.
-- Confirmed **no legacy production URL** ever existed (the deploy guide is placeholders; never deployed). Local app verified at `:5173` with all features.
-- **Next: #6 Deploy** — paused for Jon (Railway + Vercel logins).
-
-### 2026-06-19
-
-- Migrated the build process from **BMAD** to the **native persona-subagent paradigm** (the same one used on `dinner-and-groceries`). Removed `.bmad-core/`, `.cursor/rules/bmad/`, `.claude/commands/BMad/`; de-BMAD'd `README.md` + `docs/architecture*`.
-- Stood up native scaffolding: `TEAM.md`, `.claude/settings.json` allowlist, `docs/decisions/0001–0003`, `docs/retro/log.md`. Folded BMAD `brief.md` + `prd.md` into a native `SPEC.md`; kept `docs/architecture/*` as reference.
-- Resolved the 3 OPEN vocabulary calls: **Stop / Stops** (entity), **Case List** (details), **On Route / Off Route** (rep availability). Cascaded "Order ID" → **Stop ID** for coherence. Vocabulary table now fully confirmed; frontend reframe + tests can proceed from a settled spec.
-- Next: create GitHub Project board + file the remaining DSD roadmap as issues; then session restart + "start."
-
-### 2026-06-18
-
-- Pivoted repo into the Pepper DSD demo. Committed pre-existing uncommitted Datadog instrumentation to `main` (`50d8cd4`) + pushed; cut branch `dsd-convenience-store-demo` + pushed.
-- Verified green baseline. Reframed backend seed layer to DSD (commit `c63df6b`).
-- Reframe plan + DSD vocabulary approved (branch-based; both signature features; guided deploy). Frontend reframe mapped but not started. **Handed off to the delivery-simulator project session** with this PLAN as the pickup doc.
-
-### (prior) Datadog integration
-
-Datadog observability plan (APM/logs/Postgres/RUM, Phases 1-6) was implemented locally and is now committed to `main` (`50d8cd4`). See git history for detail.
+- **Native persona-subagent build process** (shared with `dinner-and-groceries`): `TEAM.md`, `SPEC.md`, `docs/decisions/` (ADRs), `docs/retro/log.md`. Work is tracked on **board #2** (six columns Backlog → Ready → In Progress → In Review → QA → Done; operate via `ghpm`). Adoption gate: the team grooms/designs until Jon says **"start."**
+- This demo is the artifact for the **Pepper** application tracked in the job-search CRM (Opportunities **row 73**).
