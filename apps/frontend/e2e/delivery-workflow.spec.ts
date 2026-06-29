@@ -5,12 +5,25 @@ import { test, expect } from '@playwright/test';
  * Dispatcher creates/assigns stops; the rep advances them Scheduled → … → Delivered.
  */
 
-const API = 'http://localhost:3001';
+const API = 'http://127.0.0.1:3001';
 const uid = () => Math.random().toString(36).slice(2, 8);
+
+// The first-visit guided tour auto-opens a spotlight overlay that would block these flows.
+// Mark it already-seen so e2e exercises the underlying role views, not the onboarding overlay.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    try {
+      window.localStorage.setItem('dsd-demo-tour-seen', '1');
+    } catch {
+      /* ignore storage failures */
+    }
+  });
+});
 
 test.describe('Delivery workflow', () => {
   test('dispatcher creates a stop that appears as Scheduled', async ({ page }) => {
-    await page.goto('/dispatch');
+    // Force Plan & Assign mode — with seed data the dispatcher otherwise defaults to Monitor.
+    await page.goto('/dispatch?mode=plan');
 
     await page.getByRole('button', { name: /new stop/i }).click();
 
