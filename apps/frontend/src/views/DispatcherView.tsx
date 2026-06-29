@@ -63,7 +63,9 @@ export function DispatcherView() {
 
   return (
     <div className="space-y-6">
-      <StatusCountsStrip counts={counts} />
+      <div data-tour="dispatcher-board">
+        <StatusCountsStrip counts={counts} />
+      </div>
 
       <div className="flex items-center justify-between gap-4">
         <div

@@ -40,7 +40,7 @@ export function RepView() {
   // Empty state — no rep chosen yet.
   if (!repId) {
     return (
-      <Card>
+      <Card data-tour="rep-view">
         <CardHeader>
           <CardTitle>Pick a rep to act as</CardTitle>
           <CardDescription>
@@ -71,7 +71,7 @@ export function RepView() {
     .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-tour="rep-view">
       <div className="flex items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold">My route today</h2>

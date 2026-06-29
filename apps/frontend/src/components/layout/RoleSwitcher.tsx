@@ -25,6 +25,8 @@ export function RoleSwitcher() {
     <div
       role="tablist"
       aria-label="Active role"
+      data-tour="role-switcher"
+      data-testid="role-switcher"
       className="inline-flex items-center gap-1 rounded-lg border bg-muted/40 p-1"
     >
       {ROLES.map((role) => {

@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import { RoleSwitcher } from '@/components/layout/RoleSwitcher';
 import { SystemMenu } from '@/components/layout/SystemMenu';
+import { TourLauncher } from '@/components/tour/TourLauncher';
 import { ImpersonationBanner } from '@/components/layout/ImpersonationBanner';
 import { useHealthCheck } from '@/hooks/useHealthCheck';
 import { Button } from '@/components/ui/button';
@@ -38,6 +39,7 @@ export function AppShell() {
           </div>
           <div className="flex items-center gap-3">
             <RoleSwitcher />
+            <TourLauncher />
             <SystemMenu />
           </div>
         </div>

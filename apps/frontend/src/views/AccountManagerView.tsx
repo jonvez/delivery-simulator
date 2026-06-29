@@ -65,7 +65,7 @@ export function AccountManagerView() {
         </Card>
       )}
 
-      <section className="space-y-4">
+      <section className="space-y-4" data-tour="accounts">
         <div>
           <h2 className="text-xl font-semibold">All store accounts</h2>
           <p className="text-sm text-muted-foreground">
