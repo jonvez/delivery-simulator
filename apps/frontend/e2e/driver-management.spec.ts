@@ -24,16 +24,32 @@ test.describe('Rep management', () => {
     // Rep roster lives in Plan & Assign; force it (seed data defaults the dispatcher to Monitor).
     await page.goto('/dispatch?mode=plan');
 
-    const firstRep = page.getByTestId('driver-item').first();
-    const toggle = firstRep.getByRole('button', { name: /mark (on|off) route/i });
+    // Create a dedicated rep so this test owns its subject and can't race other specs that
+    // touch the shared seed roster (e.g. the workflow test assigning a stop to the first rep).
+    const name = `E2E Toggle ${uid()}`;
+    await page.getByLabel(/rep name/i).fill(name);
+    await page.getByRole('button', { name: /create rep/i }).click();
 
+    const card = page
+      .getByTestId('driver-item')
+      .filter({ has: page.getByTestId('driver-name').filter({ hasText: name }) });
+    const toggle = card.getByRole('button', { name: /mark (on|off) route/i });
+
+    // A new rep starts On Route, so the button reads "Mark Off Route".
+    await expect(toggle).toBeEnabled();
     const before = (await toggle.textContent())?.trim() ?? '';
-    await toggle.click();
-    await expect(toggle).not.toHaveText(before);
+    const flipped = before.includes('Off') ? 'Mark On Route' : 'Mark Off Route';
 
-    // Toggle back to leave seed state unchanged.
+    // Assert the explicit flipped label (and wait for the PATCH+refetch to settle by
+    // re-enabling) rather than a loose not-equal, which could race the async update.
+    await toggle.click();
+    await expect(toggle).toHaveText(flipped);
+    await expect(toggle).toBeEnabled();
+
+    // Toggle back.
     await toggle.click();
     await expect(toggle).toHaveText(before);
+    await expect(toggle).toBeEnabled();
   });
 
   test('creates a rep that appears in the roster', async ({ page }) => {
